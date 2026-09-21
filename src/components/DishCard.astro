@@ -1,0 +1,87 @@
+---
+/**
+ * Scheda piatto. Senza `dish` mostra l'impaginazione con righe segnaposto (i dati reali mancano: vedi src/data/menu.ts).
+ */
+import type { Dish } from '../data/menu';
+
+interface Props {
+  dish?: Dish;
+}
+const { dish } = Astro.props;
+---
+
+{
+  dish ? (
+    <article class="dish">
+      <div class="dish__head">
+        <h3>{dish.name}</h3>
+        {dish.price && <p class="dish__price label">{dish.price}</p>}
+      </div>
+      {dish.description && <p class="dish__desc">{dish.description}</p>}
+    </article>
+  ) : (
+    <article class="dish dish--empty" aria-label="Segnaposto piatto">
+      <div class="dish__head" aria-hidden="true">
+        <span class="bar bar--title"></span>
+        <span class="bar bar--price"></span>
+      </div>
+      <div class="dish__lines" aria-hidden="true">
+        <span class="bar"></span>
+        <span class="bar bar--short"></span>
+      </div>
+      <slot />
+    </article>
+  )
+}
+
+<style>
+  .dish {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule);
+    border-radius: var(--radius-md);
+  }
+  .dish__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  .dish h3 {
+    font-size: var(--step-1);
+  }
+  .dish__price {
+    color: var(--brace);
+    white-space: nowrap;
+  }
+  .dish__desc {
+    color: var(--ink-soft);
+  }
+  .dish--empty {
+    gap: var(--space-4);
+    border-style: dashed;
+    border-color: var(--rule-strong);
+  }
+  .dish__lines {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .bar {
+    display: block;
+    height: 0.75rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+  .bar--title {
+    width: 55%;
+    height: 1.1rem;
+  }
+  .bar--price {
+    width: 3rem;
+  }
+  .bar--short {
+    width: 70%;
+  }
+</style>

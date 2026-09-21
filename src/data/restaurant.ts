@@ -20,6 +20,9 @@ export const restaurant = {
   // Verificato: una locandina dell'account Instagram ufficiale (10/09/2026) riporta "TEL WA +39 371 588 1368".
   whatsappHref: 'https://wa.me/393715881368',
   mapsHref: 'https://www.google.com/maps/search/?api=1&query=Fairuz+Via+Luigi+Vigotti+5+43126+Parma',
+  directionsHref: 'https://www.google.com/maps/dir/?api=1&destination=Fairuz+Via+Luigi+Vigotti+5+43126+Parma',
+  /** Sito attuale (fairuz.eatbu.com): oggi ospita il menu reale. Link di rimando finché il menu non è nel sito. */
+  legacySiteUrl: 'https://fairuz.eatbu.com/',
   social: {
     facebook: 'https://www.facebook.com/fairuz.ristorante.parma/',
     // Verificato: profilo ufficiale "Fairuz 🇱🇧 Ristorante Libanese a Parma" (21/09/2026: 66 post, ~3.700 follower).
