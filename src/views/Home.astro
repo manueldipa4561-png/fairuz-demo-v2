@@ -1,6 +1,14 @@
 ---
 import Todo from '../components/Todo.astro';
 import TripadvisorBadge from '../components/TripadvisorBadge.astro';
+import Chapter from '../components/home/Chapter.astro';
+import Seal from '../components/home/Seal.astro';
+import RhombusDivider from '../components/home/RhombusDivider.astro';
+import Embers from '../components/home/art/Embers.astro';
+import Smoke from '../components/home/art/Smoke.astro';
+import Bread from '../components/home/art/Bread.astro';
+import Table from '../components/home/art/Table.astro';
+import { restaurant } from '../data/restaurant';
 import { pathFor, t, type Lang } from '../i18n';
 
 interface Props {
@@ -14,49 +22,150 @@ const c = {
     eyebrow: 'Ristorante libanese · Parma',
     tagline: 'Il Libano a tavola, a Parma.',
     sub: 'Grigliate, mezze, falafel e baklawa in Via Luigi Vigotti 5.',
+    scroll: 'Scorri il racconto',
     startTitle: 'Da dove vuoi cominciare?',
     cards: {
       visit: { t: 'Prenota', p: 'Scegli data, ora e numero di persone.', cta: 'Vai alla prenotazione' },
       menu: { t: 'Il menu', p: 'Sfoglia i piatti senza uscire dal sito.', cta: 'Scopri il menu' },
       events: { t: 'Eventi & Esperienze', p: 'Serate e occasioni da vivere da Fairuz.', cta: 'Vedi gli eventi' },
     },
-    scrollTodo: 'Fase 2 — narrazione scroll a capitoli: fuoco, fumo, pane condiviso, il Libano a Parma',
     dateTodo: 'date e orari degli eventi da confermare',
   },
   en: {
     eyebrow: 'Lebanese restaurant · Parma',
     tagline: 'Lebanon at the table, in Parma.',
     sub: 'Grills, mezze, falafel and baklawa at Via Luigi Vigotti 5.',
+    scroll: 'Scroll the story',
     startTitle: 'Where would you like to start?',
     cards: {
       visit: { t: 'Book', p: 'Pick a date, a time and your party size.', cta: 'Go to booking' },
       menu: { t: 'The menu', p: 'Browse the dishes without leaving the site.', cta: 'See the menu' },
       events: { t: 'Events & Experiences', p: 'Evenings and occasions to enjoy at Fairuz.', cta: 'See events' },
     },
-    scrollTodo: 'Phase 2 — chaptered scroll story: fire, smoke, shared bread, Lebanon in Parma',
     dateTodo: 'event dates and times to confirm',
   },
 }[lang];
+
+/*
+ * Testi dei capitoli: SOLO italiano (regola 8, EN in pausa). Sono evocativi e non contengono fatti
+ * sul locale oltre a quelli verificati (piatti già citati, indirizzo, giorno di chiusura).
+ * Da far approvare al cliente: vedi docs/CONTENT-TODO.md.
+ */
+const ch = {
+  brace: {
+    kicker: 'Il fuoco',
+    lead: 'Tutto comincia dalla brace.',
+    p: 'Il profumo delle grigliate arriva prima del piatto: è il primo invito a sedersi.',
+    photo: 'foto reale: la griglia accesa',
+  },
+  fumo: {
+    kicker: "L'attesa",
+    lead: 'Il fumo sale lento.',
+    p: 'È il segnale che qualcosa sta per arrivare in tavola. Qui si rallenta, e si aspetta insieme.',
+    photo: 'foto reale: la cucina al lavoro',
+  },
+  pane: {
+    kicker: 'La condivisione',
+    lead: 'Il pane si spezza con le mani.',
+    p: 'Nella tradizione libanese le mezze si condividono: tanti piattini, un unico tavolo, il pane che passa di mano in mano.',
+    photo: 'foto reale: pane e mezze',
+  },
+  tavola: {
+    kicker: 'La tavola',
+    lead: 'Un piatto alla volta.',
+    p: 'Mezze, falafel, grigliate e, per finire, baklawa. La tavola si riempie mentre si parla.',
+    photo: 'foto reale: la tavola imbandita',
+  },
+  prenota: {
+    kicker: 'Il tuo posto',
+    lead: 'Il Libano ti aspetta a Parma.',
+    closed: `Giorno di chiusura: ${restaurant.closedDay}.`,
+    hoursTodo: 'orari di pranzo e cena',
+    photo: 'foto reale: la sala',
+  },
+};
+const bookHref = `${pathFor('visit', lang)}#prenota`;
 ---
+
+<!-- Nasconde i pezzi dell'hero che home.ts anima, solo finché lo script non è pronto (mai oltre 2,5 s). -->
+<script is:inline>
+  if (matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    document.documentElement.classList.add('motion-pending');
+    setTimeout(() => document.documentElement.classList.remove('motion-pending'), 2500);
+  }
+</script>
 
 <section class="hero">
   <div class="container">
     <div class="hero__frame">
-      <p class="label label--link hero__eyebrow">{c.eyebrow}</p>
-      <h1 class="hero__wordmark">Fairuz</h1>
-      <p class="hero__tagline italic">{c.tagline}</p>
-      <p class="hero__sub">{c.sub}</p>
-      <div class="hero__actions">
-        <a class="btn btn--primary" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.book}</a>
+      <div class="hero__seal"><Seal /></div>
+      <p class="label label--link hero__eyebrow" data-hero-reveal>{c.eyebrow}</p>
+      <h1 class="hero__wordmark" data-hero-wordmark>Fairuz</h1>
+      <p class="hero__tagline italic" data-hero-reveal>{c.tagline}</p>
+      <p class="hero__sub" data-hero-reveal>{c.sub}</p>
+      <div class="hero__actions" data-hero-reveal>
+        <a class="btn btn--primary" href={bookHref}>{copy.cta.book}</a>
         <a class="btn btn--ghost" href={pathFor('menu', lang)}>{copy.cta.menu}</a>
       </div>
-      <div class="hero__badge">
+      <div class="hero__badge" data-hero-reveal>
         <TripadvisorBadge lang={lang} />
       </div>
     </div>
-    <p class="hero__todo"><Todo>{c.scrollTodo}</Todo></p>
+    <a class="hero__cue label" href="#brace" data-hero-reveal>
+      {c.scroll}<span class="hero__cue-line" aria-hidden="true"></span>
+    </a>
   </div>
 </section>
+
+<RhombusDivider />
+
+<Chapter id="brace" index="01" word="Brace" kicker={ch.brace.kicker} tone="night" pin photoTodo={ch.brace.photo}>
+  <p class="lead">{ch.brace.lead}</p>
+  <p>{ch.brace.p}</p>
+  <Embers slot="art" />
+</Chapter>
+
+<Chapter id="fumo" index="02" word="Fumo" kicker={ch.fumo.kicker} tone="night" pin photoTodo={ch.fumo.photo}>
+  <p class="lead">{ch.fumo.lead}</p>
+  <p>{ch.fumo.p}</p>
+  <Smoke slot="art" />
+</Chapter>
+<div class="dusk" aria-hidden="true"></div>
+
+<Chapter id="pane" index="03" word="Pane" kicker={ch.pane.kicker} photoTodo={ch.pane.photo}>
+  <p class="lead">{ch.pane.lead}</p>
+  <p>{ch.pane.p}</p>
+  <Bread slot="art" />
+</Chapter>
+
+<RhombusDivider />
+
+<Chapter id="tavola" index="04" word="Tavola" kicker={ch.tavola.kicker} photoTodo={ch.tavola.photo}>
+  <p class="lead">{ch.tavola.lead}</p>
+  <p>{ch.tavola.p}</p>
+  <div class="chapter-actions">
+    <a class="btn btn--ghost" href={pathFor('menu', lang)}>{copy.cta.menu}</a>
+    <a class="btn btn--ghost" href={pathFor('events', lang)}>{copy.cta.events}</a>
+  </div>
+  <p><Todo>{c.dateTodo}</Todo></p>
+  <Table slot="art" />
+</Chapter>
+
+<Chapter id="prenota-ora" index="05" word="Prenota" kicker={ch.prenota.kicker} tone="brace" photoTodo={ch.prenota.photo}>
+  <p class="lead">{ch.prenota.lead}</p>
+  <address class="visit-facts">
+    {`${restaurant.address.street}, ${restaurant.address.postalCode} ${restaurant.address.city}`}<br />
+    {ch.prenota.closed}
+    <Todo>{ch.prenota.hoursTodo}</Todo>
+  </address>
+  <div class="chapter-actions">
+    <a class="btn btn--night" href={bookHref}>{copy.cta.book}</a>
+    <a class="btn btn--ghost" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer">
+      {copy.footer.whatsapp}<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+    </a>
+  </div>
+  <div slot="art" class="prenota-seal"><Seal /></div>
+</Chapter>
 
 <section class="section" aria-labelledby="start">
   <div class="container">
@@ -64,7 +173,7 @@ const c = {
       <h2 id="start">{c.startTitle}</h2>
     </div>
     <div class="card-grid">
-      <a class="card" href={`${pathFor('visit', lang)}#prenota`}>
+      <a class="card" href={bookHref}>
         <h3>{c.cards.visit.t}</h3>
         <p>{c.cards.visit.p}</p>
         <span class="card__cta label">{c.cards.visit.cta} →</span>
@@ -83,13 +192,17 @@ const c = {
   </div>
 </section>
 
+<script>
+  import '../scripts/home';
+</script>
+
 <style>
   .hero {
-    padding-block: var(--space-6) var(--space-7);
+    padding-block: var(--space-7) var(--space-6);
   }
   .hero__frame {
     position: relative;
-    padding: var(--space-6) var(--space-4) var(--space-7);
+    padding: var(--space-7) var(--space-4);
     border: var(--rule-w) solid var(--rule-strong);
     text-align: center;
   }
@@ -100,6 +213,14 @@ const c = {
     inset: var(--space-2);
     border: var(--rule-w) solid var(--rule);
     pointer-events: none;
+  }
+  /* Timbro che scavalca l'angolo del frame. */
+  .hero__seal {
+    position: absolute;
+    top: calc(var(--space-7) * -0.75);
+    right: var(--space-4);
+    width: clamp(4.5rem, 11vw, 8.5rem);
+    z-index: 1;
   }
   /* I <p> hanno max-width per la misura di lettura: dentro l'hero centrato vanno centrati come blocchi. */
   .hero__frame p {
@@ -125,11 +246,14 @@ const c = {
     margin: var(--space-3) auto var(--space-6);
     color: var(--ink-soft);
   }
-  .hero__actions {
+  .hero__actions,
+  .chapter-actions {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: var(--space-3);
+  }
+  .hero__actions {
+    justify-content: center;
   }
   .hero__badge {
     margin-top: var(--space-6);
@@ -137,9 +261,68 @@ const c = {
     justify-content: center;
     text-align: left;
   }
-  .hero__todo {
-    margin-top: var(--space-4);
-    text-align: center;
-    max-width: none;
+  .hero__cue {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    width: fit-content;
+    min-height: var(--touch-min);
+    margin: var(--space-5) auto 0;
+    color: var(--ink-soft);
+    text-decoration: none;
+  }
+  .hero__cue-line {
+    width: 1px;
+    height: 2.5rem;
+    background: currentColor;
+    transform-origin: top;
+    animation: cue 2.4s var(--ease-inout) infinite;
+  }
+  @keyframes cue {
+    0% {
+      transform: scaleY(0);
+    }
+    50% {
+      transform: scaleY(1);
+      transform-origin: top;
+    }
+    51% {
+      transform-origin: bottom;
+    }
+    100% {
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+  }
+
+  /* Passaggio dalla notte (fuoco, fumo) alla carta (pane, tavola). */
+  .dusk {
+    height: clamp(6rem, 18vh, 12rem);
+    background: linear-gradient(to bottom, var(--night), var(--paper));
+  }
+
+  .visit-facts {
+    font-style: normal;
+    line-height: var(--lh-body);
+  }
+  .btn--night {
+    background: var(--night);
+    color: var(--night-fg);
+  }
+  .btn--night:hover {
+    background: color-mix(in srgb, var(--night) 82%, var(--night-fg));
+  }
+  .prenota-seal {
+    max-width: 16rem;
+    margin-inline: auto;
+  }
+</style>
+
+<style is:global>
+  html.motion-pending [data-hero-wordmark],
+  html.motion-pending [data-hero-reveal],
+  html.motion-pending .hero [data-seal] {
+    visibility: hidden;
   }
 </style>
