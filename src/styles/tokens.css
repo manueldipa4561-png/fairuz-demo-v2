@@ -27,6 +27,8 @@
   --night: #1e1b18;
   --night-fg: #f4ecdd;
   --night-accent: #3cc4b7;
+  /* Segnale caldo leggibile su --night (marcatori TODO, scintille): 5.2:1 */
+  --night-warn: #e5674f;
   --rule: color-mix(in srgb, var(--ink) 22%, transparent);
   --rule-strong: var(--ink);
   --focus-ring: var(--link);
@@ -47,6 +49,7 @@
   --step-4: clamp(2.5rem, 1.8rem + 3.5vw, 4.75rem);
   --step-5: clamp(3.25rem, 2rem + 6.2vw, 8rem);
   --step-wordmark: clamp(3.25rem, 16.5vw, 15rem); /* "FAIRUZ": ~4.15em di larghezza, entra sempre nel frame */
+  --step-chapter: clamp(3rem, 15vw, 14rem); /* parole-capitolo della home ("PRENOTA" ~5.3em: entra a 375px) */
 
   --lh-tight: 1.02;
   --lh-snug: 1.2;

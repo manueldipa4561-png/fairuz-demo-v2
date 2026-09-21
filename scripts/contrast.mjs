@@ -38,12 +38,13 @@ const pairs = (t) => [
 ];
 
 // Superfici "notte" fisse (footer, strip demo, capitoli scuri): valgono in entrambi i temi.
-const night = { bg: '#1E1B18', fg: '#F4ECDD', accent: '#3CC4B7', soft: '#C9BEB0' };
+const night = { bg: '#1E1B18', fg: '#F4ECDD', accent: '#3CC4B7', soft: '#C9BEB0', warn: '#E5674F' };
 const nightPairs = [
   ['night-fg on night', night.fg, night.bg, 4.5],
   ['night-accent on night (labels/links)', night.accent, night.bg, 4.5],
   ['night-soft on night', night.soft, night.bg, 4.5],
   ['ink on night-accent fill', '#1E1B18', night.accent, 4.5],
+  ['night-warn on night (TODO, scintille)', night.warn, night.bg, 4.5],
 ];
 
 let failed = 0;
