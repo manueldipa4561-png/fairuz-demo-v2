@@ -11,7 +11,7 @@ Astro 7 (statico, deploy Netlify) · GSAP + ScrollTrigger + Lenis (solo home cin
 - `src/i18n/index.ts` — rotte localizzate (IT alla radice, EN sotto `/en`), stringhe UI e meta per pagina. `pathFor(key, lang)` per TUTTI i link (slash finale sempre).
 - `src/data/restaurant.ts` — dati VERIFICATI del ristorante; ciò che manca è `null`.
 - `src/data/menu.ts`, `src/data/events.ts` — menu ed eventi: struttura pronta, dati VUOTI di proposito (le pagine mostrano segnaposto finché non si compilano). Nessun campo per allergeni/diete.
-- `src/components/` — `PhotoFrame` (cornice foto TODO), `CtaBand` (prenota + WhatsApp), `DishCard`, `EventTicket`, `PageHero`, `Todo`.
+- `src/components/` — `PhotoFrame` (cornice foto TODO), `CtaBand` (prenota + WhatsApp), `DishCard`, `EventTicket`, `PageHero`, `Todo`, `BookingForm` (prenotazione demo), `ReviewsProof` (4,7/5 + link).
 - `src/layouts/BaseLayout.astro` — head SEO (canonical, hreflang, OG, robots, JSON-LD), skip link, strip demo, header, footer.
 - `src/views/*.astro` — contenuto di ogni pagina (prop `lang`); `src/pages/**` sono wrapper sottili IT/EN.
 - `src/scripts/motion.ts` — bootstrap GSAP/ScrollTrigger/SplitText/Lenis con `gsap.matchMedia()` (reduced-motion = niente). `src/scripts/home.ts` — timeline della home; `src/components/home/*` — capitoli, sigillo, rombi, disegni SVG.
@@ -35,7 +35,7 @@ Astro 7 (statico, deploy Netlify) · GSAP + ScrollTrigger + Lenis (solo home cin
 - [x] Fase 1 — struttura, tokens, shell, i18n, SEO, badge demo
 - [x] Fase 2 — home cinematica scroll-driven (GSAP+Lenis): capitoli BRACE → FUMO → PANE → TAVOLA → PRENOTA
 - [x] Fase 3 — pagine Menu, Eventi & Esperienze (punta), Storia, Visita (impaginazione completa, contenuti mancanti = TODO)
-- [ ] Fase 4 — prenotazione demo + recensioni + micro-interazioni
+- [x] Fase 4 — prenotazione demo (`BookingForm`, valida e rifiuta il martedì, riepilogo + WhatsApp) + recensioni (`ReviewsProof`, solo 4,7/5 e link) + micro-interazioni (view transitions native, reveal CSS scroll-driven, stelle)
 - [ ] Fase 5 — QA (Lighthouse, a11y, cross-device) e deploy
 
 ## Gestione modelli

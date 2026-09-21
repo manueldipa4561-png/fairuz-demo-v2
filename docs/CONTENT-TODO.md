@@ -10,6 +10,14 @@ Tutto ciò che in questa demo compare come **TODO** (riquadro tratteggiato) va c
 - [ ] **Dominio di produzione** (canonical, sitemap, robots).
 - [ ] **Logo** in formato vettoriale e i colori ufficiali del marchio (il logo su Instagram è azzurro/blu).
 
+## Prenotazione
+- [ ] **Sistema di prenotazione reale**: oggi il modulo è dimostrativo (nessun invio). Da decidere con il cliente: strumento (es. TheFork, Eatbu, modulo con email/WhatsApp Business), conferma al cliente e informativa privacy.
+- [ ] **Fasce orarie di servizio e posti**: l'ora è un campo libero finché non si conoscono. Da chiarire anche capienza massima per prenotazione online e regole per i gruppi.
+- [ ] **Giorni di chiusura extra** (festività, ferie): oggi il modulo rifiuta solo il martedì, l'unico giorno verificato.
+
+## Recensioni
+- [ ] Citazioni da mostrare: scegliere 2-3 recensioni reali e chiedere il consenso agli autori (oggi il blocco mostra solo 4,7/5 e il link alle recensioni reali).
+
 ## Menu
 - [ ] Piatti, descrizioni, prezzi, categorie dal **menu reale** (oggi su fairuz.eatbu.com). Struttura pronta in `src/data/menu.ts` (categorie provvisorie: mezze, grigliate, falafel, dolci): basta compilare `items`.
 - [ ] **Allergeni e diete**: il sito attuale dichiara senza glutine, halal, vegane, vegetariane. Da verificare col cliente prima di mostrarle (responsabilità legale sugli allergeni).
