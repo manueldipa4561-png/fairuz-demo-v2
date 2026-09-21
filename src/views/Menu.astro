@@ -1,0 +1,39 @@
+---
+import PageHero from '../components/PageHero.astro';
+import Todo from '../components/Todo.astro';
+import { type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const c = {
+  it: {
+    eyebrow: 'Menu',
+    title: 'Il menu',
+    intro: 'Cucina libanese: mezze, grigliate, falafel e dolci.',
+    dishes: 'Piatti, descrizioni e prezzi dal menu reale di Fairuz (oggi ospitato su un servizio esterno)',
+    diet: 'informazioni su allergeni e diete (senza glutine, halal, vegane, vegetariane): da verificare e confermare con il cliente prima di mostrarle',
+    phase: 'Fase 3 — menu navigabile per categorie, dentro il sito',
+  },
+  en: {
+    eyebrow: 'Menu',
+    title: 'The menu',
+    intro: 'Lebanese cuisine: mezze, grills, falafel and sweets.',
+    dishes: 'Dishes, descriptions and prices from the real Fairuz menu (currently hosted on an external service)',
+    diet: 'allergen and dietary information (gluten-free, halal, vegan, vegetarian): to verify and confirm with the client before showing it',
+    phase: 'Phase 3 — browsable menu by category, inside the site',
+  },
+}[lang];
+---
+
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+
+<section class="section">
+  <div class="container stack">
+    <p><Todo>{c.dishes}</Todo></p>
+    <p><Todo>{c.diet}</Todo></p>
+    <p><Todo>{c.phase}</Todo></p>
+  </div>
+</section>

@@ -1,0 +1,69 @@
+---
+import PageHero from '../components/PageHero.astro';
+import Todo from '../components/Todo.astro';
+import { type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const c = {
+  it: {
+    eyebrow: 'Eventi & Esperienze',
+    title: 'Eventi & Esperienze',
+    intro: 'Serate, sapori e occasioni per stare insieme a tavola.',
+    calendar: 'calendario reale: date, orari, prezzi e modalità di prenotazione degli eventi da confermare con il cliente',
+    phase: 'Fase 3 — pagina di punta: prossimi eventi, esperienze ricorrenti, prenotazione evento',
+    proposalsTitle: 'Proposte da valutare',
+    proposalNote: 'Proposta — non è un servizio confermato di Fairuz',
+    proposals: [
+      { t: 'Gift card', p: 'Un regalo da vivere a tavola.' },
+      { t: 'Catering & eventi privati', p: 'Fairuz per compleanni, cene aziendali e ricorrenze.' },
+      { t: 'Newsletter & lista eventi', p: 'Essere avvisati per primi sui prossimi appuntamenti.' },
+    ],
+  },
+  en: {
+    eyebrow: 'Events & Experiences',
+    title: 'Events & Experiences',
+    intro: 'Evenings, flavours and occasions to share at the table.',
+    calendar: 'real calendar: event dates, times, prices and booking rules to confirm with the client',
+    phase: 'Phase 3 — flagship page: upcoming events, recurring experiences, event booking',
+    proposalsTitle: 'Proposals to evaluate',
+    proposalNote: 'Proposal — not a confirmed Fairuz service',
+    proposals: [
+      { t: 'Gift cards', p: 'A gift to enjoy at the table.' },
+      { t: 'Catering & private events', p: 'Fairuz for birthdays, company dinners and celebrations.' },
+      { t: 'Newsletter & event list', p: 'Be the first to hear about upcoming events.' },
+    ],
+  },
+}[lang];
+---
+
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+
+<section class="section">
+  <div class="container stack">
+    <p><Todo>{c.calendar}</Todo></p>
+    <p><Todo>{c.phase}</Todo></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="proposals" style="padding-top: 0">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="proposals">{c.proposalsTitle}</h2>
+    </div>
+    <div class="card-grid">
+      {
+        c.proposals.map((p) => (
+          <article class="card">
+            <h3>{p.t}</h3>
+            <p>{p.p}</p>
+            <p><Todo>{c.proposalNote}</Todo></p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

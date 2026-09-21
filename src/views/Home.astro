@@ -1,0 +1,145 @@
+---
+import Todo from '../components/Todo.astro';
+import TripadvisorBadge from '../components/TripadvisorBadge.astro';
+import { pathFor, t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const copy = t(lang);
+
+const c = {
+  it: {
+    eyebrow: 'Ristorante libanese · Parma',
+    tagline: 'Il Libano a tavola, a Parma.',
+    sub: 'Grigliate, mezze, falafel e baklawa in Via Luigi Vigotti 5.',
+    startTitle: 'Da dove vuoi cominciare?',
+    cards: {
+      visit: { t: 'Prenota', p: 'Scegli data, ora e numero di persone.', cta: 'Vai alla prenotazione' },
+      menu: { t: 'Il menu', p: 'Sfoglia i piatti senza uscire dal sito.', cta: 'Scopri il menu' },
+      events: { t: 'Eventi & Esperienze', p: 'Serate e occasioni da vivere da Fairuz.', cta: 'Vedi gli eventi' },
+    },
+    scrollTodo: 'Fase 2 — narrazione scroll a capitoli: fuoco, fumo, pane condiviso, il Libano a Parma',
+    dateTodo: 'date e orari degli eventi da confermare',
+  },
+  en: {
+    eyebrow: 'Lebanese restaurant · Parma',
+    tagline: 'Lebanon at the table, in Parma.',
+    sub: 'Grills, mezze, falafel and baklawa at Via Luigi Vigotti 5.',
+    startTitle: 'Where would you like to start?',
+    cards: {
+      visit: { t: 'Book', p: 'Pick a date, a time and your party size.', cta: 'Go to booking' },
+      menu: { t: 'The menu', p: 'Browse the dishes without leaving the site.', cta: 'See the menu' },
+      events: { t: 'Events & Experiences', p: 'Evenings and occasions to enjoy at Fairuz.', cta: 'See events' },
+    },
+    scrollTodo: 'Phase 2 — chaptered scroll story: fire, smoke, shared bread, Lebanon in Parma',
+    dateTodo: 'event dates and times to confirm',
+  },
+}[lang];
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero__frame">
+      <p class="label label--link hero__eyebrow">{c.eyebrow}</p>
+      <h1 class="hero__wordmark">Fairuz</h1>
+      <p class="hero__tagline italic">{c.tagline}</p>
+      <p class="hero__sub">{c.sub}</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.book}</a>
+        <a class="btn btn--ghost" href={pathFor('menu', lang)}>{copy.cta.menu}</a>
+      </div>
+      <div class="hero__badge">
+        <TripadvisorBadge lang={lang} />
+      </div>
+    </div>
+    <p class="hero__todo"><Todo>{c.scrollTodo}</Todo></p>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="start">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="start">{c.startTitle}</h2>
+    </div>
+    <div class="card-grid">
+      <a class="card" href={`${pathFor('visit', lang)}#prenota`}>
+        <h3>{c.cards.visit.t}</h3>
+        <p>{c.cards.visit.p}</p>
+        <span class="card__cta label">{c.cards.visit.cta} →</span>
+      </a>
+      <a class="card" href={pathFor('menu', lang)}>
+        <h3>{c.cards.menu.t}</h3>
+        <p>{c.cards.menu.p}</p>
+        <span class="card__cta label">{c.cards.menu.cta} →</span>
+      </a>
+      <a class="card" href={pathFor('events', lang)}>
+        <h3>{c.cards.events.t}</h3>
+        <p>{c.cards.events.p} <Todo>{c.dateTodo}</Todo></p>
+        <span class="card__cta label">{c.cards.events.cta} →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-6) var(--space-7);
+  }
+  .hero__frame {
+    position: relative;
+    padding: var(--space-6) var(--space-4) var(--space-7);
+    border: var(--rule-w) solid var(--rule-strong);
+    text-align: center;
+  }
+  /* Filetto interno sottile: eco delle carte-menù stampate del riferimento editoriale. */
+  .hero__frame::before {
+    content: '';
+    position: absolute;
+    inset: var(--space-2);
+    border: var(--rule-w) solid var(--rule);
+    pointer-events: none;
+  }
+  /* I <p> hanno max-width per la misura di lettura: dentro l'hero centrato vanno centrati come blocchi. */
+  .hero__frame p {
+    margin-inline: auto;
+  }
+  .hero__eyebrow {
+    margin-bottom: var(--space-4);
+  }
+  .hero__wordmark {
+    font-size: var(--step-wordmark);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .hero__tagline {
+    margin-top: var(--space-4);
+    font-size: var(--step-2);
+    color: var(--link);
+  }
+  .hero__sub {
+    margin: var(--space-3) auto var(--space-6);
+    color: var(--ink-soft);
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+  }
+  .hero__badge {
+    margin-top: var(--space-6);
+    display: flex;
+    justify-content: center;
+    text-align: left;
+  }
+  .hero__todo {
+    margin-top: var(--space-4);
+    text-align: center;
+    max-width: none;
+  }
+</style>

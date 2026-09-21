@@ -1,0 +1,42 @@
+---
+import PageHero from '../components/PageHero.astro';
+import Todo from '../components/Todo.astro';
+import { type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const c = {
+  it: {
+    eyebrow: 'Storia',
+    title: 'La nostra storia',
+    intro: 'Il Libano a Parma, raccontato a tavola.',
+    story: 'storia reale di Fairuz: famiglia, origini del locale e dei piatti (testi da ricevere dal cliente)',
+    name: 'origine del nome “Fairuz”: da chiedere al cliente, non dedurla',
+    photos: 'foto reali del locale, della cucina e delle persone',
+    phase: 'Fase 3 — pagina Storia in capitoli, con ritmo editoriale',
+  },
+  en: {
+    eyebrow: 'Story',
+    title: 'Our story',
+    intro: 'Lebanon in Parma, told at the table.',
+    story: 'the real Fairuz story: family, the origins of the restaurant and of the dishes (copy to be supplied by the client)',
+    name: 'origin of the name “Fairuz”: ask the client, do not assume',
+    photos: 'real photos of the restaurant, the kitchen and the people',
+    phase: 'Phase 3 — Story page in chapters, with an editorial rhythm',
+  },
+}[lang];
+---
+
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+
+<section class="section">
+  <div class="container stack">
+    <p><Todo>{c.story}</Todo></p>
+    <p><Todo>{c.name}</Todo></p>
+    <p><Todo>{c.photos}</Todo></p>
+    <p><Todo>{c.phase}</Todo></p>
+  </div>
+</section>
