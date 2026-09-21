@@ -1,39 +1,164 @@
 ---
+import CtaBand from '../components/CtaBand.astro';
+import DishCard from '../components/DishCard.astro';
 import PageHero from '../components/PageHero.astro';
 import Todo from '../components/Todo.astro';
-import { type Lang } from '../i18n';
+import { menuCategories } from '../data/menu';
+import { restaurant } from '../data/restaurant';
+import { t, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
+const copy = t(lang);
 
+// Solo italiano (regola 8): l'inglese si riattiva riscrivendo questo blocco per lingua.
 const c = {
-  it: {
-    eyebrow: 'Menu',
-    title: 'Il menu',
-    intro: 'Cucina libanese: mezze, grigliate, falafel e dolci.',
-    dishes: 'Piatti, descrizioni e prezzi dal menu reale di Fairuz (oggi ospitato su un servizio esterno)',
-    diet: 'informazioni su allergeni e diete (senza glutine, halal, vegane, vegetariane): da verificare e confermare con il cliente prima di mostrarle',
-    phase: 'Fase 3 — menu navigabile per categorie, dentro il sito',
-  },
-  en: {
-    eyebrow: 'Menu',
-    title: 'The menu',
-    intro: 'Lebanese cuisine: mezze, grills, falafel and sweets.',
-    dishes: 'Dishes, descriptions and prices from the real Fairuz menu (currently hosted on an external service)',
-    diet: 'allergen and dietary information (gluten-free, halal, vegan, vegetarian): to verify and confirm with the client before showing it',
-    phase: 'Phase 3 — browsable menu by category, inside the site',
-  },
-}[lang];
+  eyebrow: 'Menu',
+  title: 'Il menu',
+  intro: 'Cucina libanese: mezze, grigliate, falafel e dolci.',
+  navLabel: 'Categorie del menu',
+  categoriesTodo: 'categorie provvisorie (mezze, grigliate, falafel, dolci): da allineare al menu reale',
+  dishTodo: 'piatti, descrizioni e prezzi di questa categoria dal menu reale di Fairuz',
+  dietTitle: 'Allergeni e diete',
+  dietTodo:
+    'informazioni su allergeni e diete (senza glutine, halal, vegane, vegetariane): da verificare e confermare con il cliente prima di mostrarle',
+  legacy: 'Nel frattempo il menu completo è consultabile sul sito attuale',
+  legacyCta: 'Apri il menu attuale',
+  newTab: copy.tripadvisor.newTab,
+  bandTitle: 'Hai scelto? Ti aspettiamo a tavola.',
+};
 ---
 
-<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
+  <p class="menu-note"><Todo>{c.categoriesTodo}</Todo></p>
+</PageHero>
 
-<section class="section">
+<nav class="menu-nav" aria-label={c.navLabel} data-menu-nav>
+  <div class="container">
+    <ul role="list">
+      {
+        menuCategories.map((cat) => (
+          <li>
+            <a class="label" href={`#${cat.id}`}>{cat.label}</a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>
+
+{
+  menuCategories.map((cat) => (
+    <section class="section menu-section" id={cat.id} aria-labelledby={`${cat.id}-title`}>
+      <div class="container">
+        <div class="section-head">
+          <h2 id={`${cat.id}-title`}>{cat.label}</h2>
+        </div>
+        <div class="dish-grid">
+          {cat.items.length > 0 ? (
+            cat.items.map((dish) => <DishCard dish={dish} />)
+          ) : (
+            <DishCard>
+              <p>
+                <Todo>{c.dishTodo}</Todo>
+              </p>
+            </DishCard>
+          )}
+        </div>
+      </div>
+    </section>
+  ))
+}
+
+<section class="section menu-diet" aria-labelledby="diet">
   <div class="container stack">
-    <p><Todo>{c.dishes}</Todo></p>
-    <p><Todo>{c.diet}</Todo></p>
-    <p><Todo>{c.phase}</Todo></p>
+    <h2 id="diet">{c.dietTitle}</h2>
+    <p><Todo>{c.dietTodo}</Todo></p>
+    <p>
+      {c.legacy}:
+      <a href={restaurant.legacySiteUrl} target="_blank" rel="noopener noreferrer">
+        {c.legacyCta}<span class="sr-only"> {c.newTab}</span>
+      </a>.
+    </p>
   </div>
 </section>
+
+<CtaBand lang={lang} title={c.bandTitle} />
+
+<script>
+  // Categoria attiva nella barra sticky (solo miglioramento: senza JS restano i link ad ancora).
+  const nav = document.querySelector<HTMLElement>('[data-menu-nav]');
+  if (nav && 'IntersectionObserver' in window) {
+    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
+    const byId = new Map(links.map((a) => [a.hash.slice(1), a]));
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          links.forEach((l) => l.removeAttribute('aria-current'));
+          byId.get(e.target.id)?.setAttribute('aria-current', 'true');
+        }
+      },
+      { rootMargin: '-30% 0px -60% 0px' },
+    );
+    byId.forEach((_, id) => {
+      const section = document.getElementById(id);
+      if (section) io.observe(section);
+    });
+  }
+</script>
+
+<style>
+  .menu-note {
+    margin-top: var(--space-5);
+  }
+  .menu-nav {
+    position: sticky;
+    top: var(--header-h);
+    z-index: calc(var(--z-header) - 1);
+    background: color-mix(in srgb, var(--paper) 94%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: var(--rule-w) solid var(--rule);
+  }
+  .menu-nav ul {
+    display: flex;
+    gap: var(--space-2);
+    margin: 0;
+    padding-block: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .menu-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-min);
+    padding-inline: var(--space-4);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-pill);
+    color: var(--ink);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .menu-nav a:hover,
+  .menu-nav a[aria-current='true'] {
+    /* Testo scuro fisso su turchese pieno (regola 5). */
+    background: var(--turquoise);
+    border-color: var(--turquoise);
+    color: var(--night);
+  }
+  .menu-section {
+    scroll-margin-top: 3.5rem;
+    padding-block: var(--space-8) 0;
+  }
+  .dish-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  }
+  .menu-diet {
+    padding-block: var(--space-8);
+  }
+</style>

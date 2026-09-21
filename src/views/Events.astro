@@ -1,58 +1,89 @@
 ---
+import CtaBand from '../components/CtaBand.astro';
+import EventTicket from '../components/EventTicket.astro';
 import PageHero from '../components/PageHero.astro';
+import PhotoFrame from '../components/PhotoFrame.astro';
 import Todo from '../components/Todo.astro';
-import { type Lang } from '../i18n';
+import RhombusDivider from '../components/home/RhombusDivider.astro';
+import { events } from '../data/events';
+import { restaurant } from '../data/restaurant';
+import { pathFor, t, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
+const copy = t(lang);
 
+// Solo italiano (regola 8): l'inglese si riattiva riscrivendo questo blocco per lingua.
 const c = {
-  it: {
-    eyebrow: 'Eventi & Esperienze',
-    title: 'Eventi & Esperienze',
-    intro: 'Serate, sapori e occasioni per stare insieme a tavola.',
-    calendar: 'calendario reale: date, orari, prezzi e modalità di prenotazione degli eventi da confermare con il cliente',
-    phase: 'Fase 3 — pagina di punta: prossimi eventi, esperienze ricorrenti, prenotazione evento',
-    proposalsTitle: 'Proposte da valutare',
-    proposalNote: 'Proposta — non è un servizio confermato di Fairuz',
-    proposals: [
-      { t: 'Gift card', p: 'Un regalo da vivere a tavola.' },
-      { t: 'Catering & eventi privati', p: 'Fairuz per compleanni, cene aziendali e ricorrenze.' },
-      { t: 'Newsletter & lista eventi', p: 'Essere avvisati per primi sui prossimi appuntamenti.' },
-    ],
-  },
-  en: {
-    eyebrow: 'Events & Experiences',
-    title: 'Events & Experiences',
-    intro: 'Evenings, flavours and occasions to share at the table.',
-    calendar: 'real calendar: event dates, times, prices and booking rules to confirm with the client',
-    phase: 'Phase 3 — flagship page: upcoming events, recurring experiences, event booking',
-    proposalsTitle: 'Proposals to evaluate',
-    proposalNote: 'Proposal — not a confirmed Fairuz service',
-    proposals: [
-      { t: 'Gift cards', p: 'A gift to enjoy at the table.' },
-      { t: 'Catering & private events', p: 'Fairuz for birthdays, company dinners and celebrations.' },
-      { t: 'Newsletter & event list', p: 'Be the first to hear about upcoming events.' },
-    ],
-  },
-}[lang];
+  eyebrow: 'Eventi & Esperienze',
+  title: 'Eventi & Esperienze',
+  intro: 'Serate, sapori e occasioni per stare insieme a tavola.',
+  nextTitle: 'Prossimi appuntamenti',
+  calendarTodo:
+    'calendario reale: date, orari, prezzi e modalità di prenotazione degli eventi da confermare con il cliente',
+  recurringTitle: 'Esperienze ricorrenti',
+  recurringTodo: 'esperienze ricorrenti (se esistono): nome, giorni, descrizione da confermare con il cliente',
+  recurringPhoto: 'foto reale: una serata da Fairuz',
+  proposalsTitle: 'Proposte da valutare',
+  proposalsIntro: 'Idee per ampliare l’offerta, mostrate come dimostrazione e da confermare con il cliente.',
+  proposalNote: 'Proposta — non è un servizio confermato di Fairuz',
+  proposals: [
+    { t: 'Gift card', p: 'Un regalo da vivere a tavola.' },
+    { t: 'Catering & eventi privati', p: 'Fairuz per compleanni, cene aziendali e ricorrenze.' },
+    { t: 'Newsletter & lista eventi', p: 'Essere avvisati per primi sui prossimi appuntamenti.' },
+  ],
+  bandTitle: 'Vuoi sapere cosa c’è in programma?',
+  bandText: 'Scrivici su WhatsApp o prenota il tuo tavolo.',
+};
 ---
 
-<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
+  <div class="actions events-actions">
+    <a class="btn btn--primary" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.book}</a>
+    <a class="btn btn--ghost" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer">
+      {copy.footer.whatsapp}<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+    </a>
+  </div>
+</PageHero>
 
-<section class="section">
-  <div class="container stack">
-    <p><Todo>{c.calendar}</Todo></p>
-    <p><Todo>{c.phase}</Todo></p>
+<section class="section" aria-labelledby="next">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="next">{c.nextTitle}</h2>
+    </div>
+    <div class="ticket-list">
+      {
+        events.length > 0 ? (
+          events.map((event) => <EventTicket event={event} />)
+        ) : (
+          <EventTicket>
+            <p><Todo>{c.calendarTodo}</Todo></p>
+          </EventTicket>
+        )
+      }
+    </div>
   </div>
 </section>
 
-<section class="section" aria-labelledby="proposals" style="padding-top: 0">
+<RhombusDivider />
+
+<section class="section" aria-labelledby="recurring">
+  <div class="container recurring">
+    <div class="stack">
+      <h2 id="recurring">{c.recurringTitle}</h2>
+      <p><Todo>{c.recurringTodo}</Todo></p>
+    </div>
+    <div class="recurring__photo"><PhotoFrame todo={c.recurringPhoto} /></div>
+  </div>
+</section>
+
+<section class="section proposals" aria-labelledby="proposals">
   <div class="container">
     <div class="section-head">
       <h2 id="proposals">{c.proposalsTitle}</h2>
+      <p>{c.proposalsIntro}</p>
     </div>
     <div class="card-grid">
       {
@@ -67,3 +98,36 @@ const c = {
     </div>
   </div>
 </section>
+
+<CtaBand lang={lang} title={c.bandTitle} text={c.bandText} />
+
+<style>
+  .events-actions {
+    margin-top: var(--space-6);
+  }
+  .ticket-list {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .recurring {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+  .recurring__photo {
+    --photo-ratio: 4 / 3;
+    width: 100%;
+    max-width: 26rem;
+  }
+  .proposals {
+    padding-top: 0;
+  }
+  @media (min-width: 60rem) {
+    .recurring {
+      grid-template-columns: 1fr 1fr;
+    }
+    .recurring__photo {
+      justify-self: end;
+    }
+  }
+</style>
