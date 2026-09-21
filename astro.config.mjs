@@ -11,15 +11,12 @@ export default defineConfig({
   site,
   trailingSlash: 'always',
   build: { format: 'directory' },
+  // Solo italiano per ora (EN in pausa fino all'approvazione del cliente).
+  // Per riattivarlo: locales ['it', 'en'] + sitemap({ i18n: { defaultLocale: 'it', locales: { it: 'it-IT', en: 'en-GB' } } }).
   i18n: {
     defaultLocale: 'it',
-    locales: ['it', 'en'],
-    // Italian lives at the root (/menu), English under /en (/en/menu).
+    locales: ['it'],
     routing: { prefixDefaultLocale: false },
   },
-  integrations: [
-    sitemap({
-      i18n: { defaultLocale: 'it', locales: { it: 'it-IT', en: 'en-GB' } },
-    }),
-  ],
+  integrations: [sitemap()],
 });

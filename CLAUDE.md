@@ -22,6 +22,8 @@ Astro 7 (statico, deploy Netlify) · GSAP + ScrollTrigger + Lenis (solo home cin
 5. Turchese `--turquoise` solo per riempimenti/decoro con testo scuro; per testo/bordi/focus su carta usare `--link`. Mai testo bianco su turchese.
 6. Accessibilità: target touch ≥ 44px, focus visibile, `prefers-reduced-motion` rispettato (le animazioni GSAP devono leggere la stessa media query).
 7. Nessun backend: la prenotazione è dimostrativa (form front-end + WhatsApp come via secondaria).
+8. **Solo italiano** finché il cliente non paga (decisione del 21/09/2026). Non scrivere né tradurre contenuti EN, non ricreare `src/pages/en`. L'impianto i18n resta pronto (`enabledLocales` in `src/i18n/index.ts`, istruzioni per riattivare nel commento). Le stringhe EN già presenti sono dormienti.
+9. **Foto**: usare solo immagini che appartengono a Fairuz (suo sito, sue pagine social) e solo con OK esplicito dell'utente prima di scaricarle. Mai foto di utenti Tripadvisor/Google né immagini del template Da Maria (sono solo riferimento visivo). Registrare origine di ogni foto in `docs/PHOTO-CREDITS.md`.
 
 ## Comandi
 `npm run dev` · `npm run build` · `npm run check` · `node scripts/contrast.mjs`

@@ -8,7 +8,7 @@ import '../styles/global.css';
 import DemoStrip from '../components/DemoStrip.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { locales, otherLang, pathFor, t, type Lang, type PageKey } from '../i18n';
+import { enabledLocales, isMultilingual, otherLang, pathFor, t, type Lang, type PageKey } from '../i18n';
 import { restaurantSchema } from '../lib/schema';
 
 interface Props {
@@ -44,8 +44,14 @@ const schema = withSchema ? restaurantSchema(lang, site, ogImage) : null;
     <link rel="canonical" href={canonical} />
     <meta name="robots" content={allowIndexing ? 'index, follow' : 'noindex, nofollow'} />
 
-    {locales.map((l) => <link rel="alternate" hreflang={l} href={abs(pathFor(pageKey, l))} />)}
-    <link rel="alternate" hreflang="x-default" href={abs(pathFor(pageKey, 'it'))} />
+    {
+      isMultilingual && (
+        <>
+          {enabledLocales.map((l) => <link rel="alternate" hreflang={l} href={abs(pathFor(pageKey, l))} />)}
+          <link rel="alternate" hreflang="x-default" href={abs(pathFor(pageKey, 'it'))} />
+        </>
+      )
+    }
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Fairuz Parma" />
@@ -53,7 +59,7 @@ const schema = withSchema ? restaurantSchema(lang, site, ogImage) : null;
     <meta property="og:description" content={meta.description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={copy.ogLocale} />
-    <meta property="og:locale:alternate" content={t(otherLang(lang)).ogLocale} />
+    {isMultilingual && <meta property="og:locale:alternate" content={t(otherLang(lang)).ogLocale} />}
     <meta property="og:image" content={abs(ogImage)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />

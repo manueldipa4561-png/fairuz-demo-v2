@@ -7,6 +7,15 @@ export const locales = ['it', 'en'] as const;
 export type Lang = (typeof locales)[number];
 export const defaultLang: Lang = 'it';
 
+/**
+ * Lingue attualmente PUBBLICATE. L'inglese è in pausa finché il cliente non approva il progetto:
+ * l'impianto (rotte, stringhe, contenuti EN nelle viste) resta pronto, ma non si costruiscono
+ * pagine EN, né bottone lingua, né hreflang. Per riattivare: aggiungere 'en' qui, ricreare
+ * src/pages/en/* (vedi git history del commit "feat(pages)") e riabilitare 'en' in astro.config.mjs.
+ */
+export const enabledLocales: readonly Lang[] = ['it'];
+export const isMultilingual = enabledLocales.length > 1;
+
 export type PageKey = 'home' | 'menu' | 'events' | 'story' | 'visit';
 export const pageKeys: PageKey[] = ['home', 'menu', 'events', 'story', 'visit'];
 /** Voci di navigazione principale (la home è il wordmark). */

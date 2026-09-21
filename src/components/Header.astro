@@ -1,5 +1,5 @@
 ---
-import { navKeys, otherLang, pathFor, t, type Lang, type PageKey } from '../i18n';
+import { isMultilingual, navKeys, otherLang, pathFor, t, type Lang, type PageKey } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -37,13 +37,18 @@ const links = navKeys.map((key) => ({
     </nav>
 
     <div class="site-header__actions">
-      <a
-        class="lang label"
-        href={pathFor(pageKey, alt)}
-        hreflang={alt}
-        lang={alt}
-        aria-label={copy.langSwitch.aria}>{copy.langSwitch.label}</a
-      >
+      {
+        isMultilingual && (
+          <a
+            class="lang label"
+            href={pathFor(pageKey, alt)}
+            hreflang={alt}
+            lang={alt}
+            aria-label={copy.langSwitch.aria}>
+            {copy.langSwitch.label}
+          </a>
+        )
+      }
       <a class="btn btn--primary btn--sm" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.bookShort}</a>
       <button
         type="button"

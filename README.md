@@ -18,15 +18,11 @@ Richiede Node ≥ 22.12.
 
 ## Architettura
 
-Ibrida: **home cinematica scroll-driven** (GSAP + Lenis, Fase 2) + **pagine funzionali** indicizzabili: Menu, Eventi & Esperienze, Storia, Visita & Prenota. Italiano alla radice, inglese sotto `/en`.
+Ibrida: **home cinematica scroll-driven** (GSAP + Lenis, Fase 2) + **pagine funzionali** indicizzabili: Menu, Eventi & Esperienze, Storia, Visita & Prenota.
 
-| Pagina IT | Pagina EN |
-|---|---|
-| `/` | `/en/` |
-| `/menu/` | `/en/menu/` |
-| `/eventi/` | `/en/events/` |
-| `/storia/` | `/en/story/` |
-| `/visita-prenota/` | `/en/visit-book/` |
+Solo italiano per ora: l'inglese (`/en`) è in pausa finché il cliente non approva il progetto, ma l'impianto i18n è pronto (vedi `enabledLocales` in `src/i18n/index.ts`).
+
+`/` · `/menu/` · `/eventi/` · `/storia/` · `/visita-prenota/`
 
 Design "Turchese & Carta": carta calda, antracite, turchese (firma), brace (CTA), blush (decoro). Playfair Display + Karla + JetBrains Mono. Token in `src/styles/tokens.css`.
 
