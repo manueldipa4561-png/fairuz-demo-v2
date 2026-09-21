@@ -10,7 +10,7 @@ const site = process.env.SITE_URL || process.env.URL || 'https://fairuz-demo-v2.
 export default defineConfig({
   site,
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  build: { format: 'directory', inlineStylesheets: 'always' },
   // Solo italiano per ora (EN in pausa fino all'approvazione del cliente).
   // Per riattivarlo: locales ['it', 'en'] + sitemap({ i18n: { defaultLocale: 'it', locales: { it: 'it-IT', en: 'en-GB' } } }).
   i18n: {

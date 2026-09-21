@@ -66,14 +66,6 @@ initMotion(({ desktop, headerH }) => {
     return s.chars;
   };
 
-  // ── Hero: il wordmark sale lettera per lettera ─────────────────
-  const wordmark = $('[data-hero-wordmark]');
-  if (wordmark) {
-    gsap.from(split(wordmark), { yPercent: 110, duration: 1.2, ease: 'expo.out', stagger: 0.07, delay: 0.1 });
-  }
-  gsap.from('[data-hero-reveal]', { y: 24, autoAlpha: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 0.55 });
-  gsap.from('.hero [data-seal]', { scale: 0.6, rotate: -40, autoAlpha: 0, duration: 1.2, ease: 'back.out(1.6)', delay: 0.8 });
-
   // ── Capitoli ───────────────────────────────────────────────────
   for (const chapter of $$('[data-chapter]')) {
     const word = $('[data-chapter-word]', chapter);

@@ -8,12 +8,12 @@ const { lang } = Astro.props;
 const { demo } = t(lang);
 ---
 
-<div class="demo-strip" role="note">
+<aside class="demo-strip" aria-label={lang === 'it' ? 'Avviso: sito dimostrativo' : 'Notice: demo website'}>
   <p class="container demo-strip__inner">
     <span class="demo-strip__badge label">{demo.badge}</span>
     <span class="demo-strip__text">{demo.text}</span>
   </p>
-</div>
+</aside>
 
 <style>
   .demo-strip {

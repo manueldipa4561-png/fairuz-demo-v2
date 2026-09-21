@@ -293,7 +293,7 @@ a.card:hover {
   border: 1px dashed var(--brace);
   border-radius: var(--radius-sm);
   color: var(--brace);
-  background: color-mix(in srgb, var(--brace) 8%, transparent);
+  background: color-mix(in srgb, var(--brace) 8%, var(--surface));
   font-family: var(--font-mono);
   font-size: var(--step--1);
   font-weight: 500;

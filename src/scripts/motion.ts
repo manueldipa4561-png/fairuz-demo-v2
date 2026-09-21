@@ -23,9 +23,6 @@ type Setup = (ctx: MotionContext) => void | (() => void);
 
 const root = document.documentElement;
 
-/** Tolto sempre, anche con movimento ridotto: vedi lo script inline in Home.astro. */
-const release = () => root.classList.remove('motion-pending');
-
 function startLenis() {
   const scrollPadding = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
   const lenis = new Lenis({ autoRaf: false, anchors: { offset: -scrollPadding } });
@@ -46,20 +43,31 @@ function startLenis() {
   };
 }
 
+/** Esegue `fn` dopo il load, a browser inattivo: l'hero (CSS) non aspetta GSAP e LCP/TBT restano bassi. */
+function whenIdle(fn: () => void) {
+  // Safari non ha requestIdleCallback: ripiego su un timeout breve.
+  const idle = () => {
+    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(fn, { timeout: 1500 });
+    else window.setTimeout(fn, 200);
+  };
+  if (document.readyState === 'complete') idle();
+  else window.addEventListener('load', idle, { once: true });
+}
+
 export function initMotion(setup: Setup) {
+  whenIdle(() => start(setup));
+}
+
+function start(setup: Setup) {
   const mm = gsap.matchMedia();
   mm.add(
     { motion: '(prefers-reduced-motion: no-preference)', desktop: '(min-width: 60rem)' },
     (context) => {
       const { motion, desktop } = context.conditions as { motion: boolean; desktop: boolean };
-      if (!motion) {
-        release();
-        return;
-      }
+      if (!motion) return;
       const stopLenis = startLenis();
       const headerH = document.querySelector<HTMLElement>('[data-site-header]')?.offsetHeight ?? 0;
       const cleanup = setup({ desktop, headerH });
-      release();
       // I font variabili cambiano le misure del testo gigante: ricalcola i trigger quando sono pronti.
       document.fonts?.ready.then(() => ScrollTrigger.refresh());
       return () => {
@@ -68,6 +76,4 @@ export function initMotion(setup: Setup) {
       };
     },
   );
-  // Rete di sicurezza se qualcosa sopra fallisce.
-  window.setTimeout(release, 1500);
 }

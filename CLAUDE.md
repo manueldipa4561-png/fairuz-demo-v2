@@ -36,7 +36,7 @@ Astro 7 (statico, deploy Netlify) · GSAP + ScrollTrigger + Lenis (solo home cin
 - [x] Fase 2 — home cinematica scroll-driven (GSAP+Lenis): capitoli BRACE → FUMO → PANE → TAVOLA → PRENOTA
 - [x] Fase 3 — pagine Menu, Eventi & Esperienze (punta), Storia, Visita (impaginazione completa, contenuti mancanti = TODO)
 - [x] Fase 4 — prenotazione demo (`BookingForm`, valida e rifiuta il martedì, riepilogo + WhatsApp) + recensioni (`ReviewsProof`, solo 4,7/5 e link) + micro-interazioni (view transitions native, reveal CSS scroll-driven, stelle)
-- [ ] Fase 5 — QA (Lighthouse, a11y, cross-device) e deploy
+- [x] Fase 5 — QA: a11y 0 violazioni axe (chiaro/scuro, mobile/desktop), Lighthouse a11y 100 e perf 98-100 sulle pagine interne (home mobile ~76, accettabile per la demo), CLS azzerato, 404, font preload, CSS inline. Deploy: a cura del cliente (Netlify).
 
 ## Gestione modelli
 Opus solo per architettura/animazioni complesse; Sonnet per implementazione; Haiku per testi e modifiche minime. A fine fase: commit chiaro + riassunto in 5 righe.

@@ -44,3 +44,18 @@ Usa solo informazioni verificate. Ciò che manca è segnato **TODO** nel sito e 
 ## Stato
 
 Vedi `CLAUDE.md` per le fasi e le regole del progetto.
+
+## QA (Fase 5)
+
+Verifiche eseguite sulla build di produzione (`npm run build` + `npm run preview`):
+
+- **Accessibilità**: 0 violazioni axe-core su tutte le pagine (home, menu, eventi, storia, visita, 404) in tema chiaro e scuro, a 375 e 1280 px. Lighthouse accessibilità 100.
+- **Lighthouse (mobile)**: performance 98-100 sulle pagine interne, ~76 sulla home (scroll cinematica GSAP: accettabile per una demo). Best practices 100, CLS ~0.
+- **Cross-device**: nessun overflow orizzontale da 320 a 1920 px; navigazione da tastiera con focus visibile; `prefers-reduced-motion` disattiva Lenis, pin, transizioni e reveal; senza JS il modulo di prenotazione lascia WhatsApp/telefono.
+- **SEO**: la demo resta `noindex` (Lighthouse "is-crawlable" fallisce di proposito finché `PUBLIC_ALLOW_INDEXING` non è `true`).
+
+### Deploy (a cura del cliente/agenzia)
+
+1. Collega il repo a Netlify: build `npm run build`, publish `dist` (già in `netlify.toml`).
+2. Variabili d'ambiente: `SITE_URL` col dominio reale; `PUBLIC_ALLOW_INDEXING=true` solo quando la demo va indicizzata.
+3. Dopo il primo deploy, aggiorna l'URL in `public/robots.txt` (riga `Sitemap:`) col dominio definitivo.

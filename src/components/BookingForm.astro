@@ -4,7 +4,7 @@
  * Valida nel browser, mostra un riepilogo e offre WhatsApp come via secondaria: i dati non vengono inviati
  * né salvati. Nessuna fascia oraria inventata (gli orari reali mancano): l'ora è libera e si segnala il TODO.
  * Rifiuta le date del giorno di chiusura verificato (martedì).
- * Progressive enhancement: senza JS il modulo resta nascosto e compare l'alternativa WhatsApp/telefono.
+ * Progressive enhancement: senza JS il modulo è nascosto (html:not(.js)) e resta l'alternativa WhatsApp/telefono.
  */
 import { restaurant } from '../data/restaurant';
 import Todo from './Todo.astro';
@@ -51,7 +51,7 @@ const c = {
 
   <noscript><p>{c.noJs}</p></noscript>
 
-  <form class="booking__form" novalidate hidden data-booking-form aria-label="Prenota un tavolo">
+  <form class="booking__form" novalidate data-booking-form aria-label="Prenota un tavolo">
     <div class="booking__row booking__row--3">
       <div class="field">
         <label for="b-date">{c.date}</label>
@@ -250,7 +250,6 @@ const c = {
       fields.date.focus();
     });
 
-    form.hidden = false;
   }
 </script>
 
@@ -285,6 +284,8 @@ const c = {
     display: grid;
     gap: var(--space-5);
   }
+  /* Senza JS il modulo non può funzionare: resta l'alternativa WhatsApp/telefono (classe `js` impostata in <head>). */
+  :global(html:not(.js)) .booking__form,
   .booking__form[hidden],
   .booking__result[hidden] {
     display: none;

@@ -21,6 +21,13 @@ const themes = {
   },
 };
 
+// Colore risultante da `pct` di `top` sopra `base` (come color-mix in srgb con trasparenza).
+const mix = (top, base, pct) => {
+  const t = top.replace('#', '').match(/../g).map((h) => parseInt(h, 16));
+  const b = base.replace('#', '').match(/../g).map((h) => parseInt(h, 16));
+  return '#' + t.map((v, i) => Math.round(v * pct + b[i] * (1 - pct)).toString(16).padStart(2, '0')).join('');
+};
+
 // [label, fg, bg, minimum]
 const pairs = (t) => [
   ['ink on paper (body)', t.ink, t.paper, 4.5],
@@ -34,6 +41,7 @@ const pairs = (t) => [
   ['ink on turquoise fill (badges/tiles)', t.ink === '#F4ECDD' ? t.paper : t.ink, t.turquoise, 4.5],
   ['turquoiseText vs paper (UI border/focus ring, 3:1)', t.turquoiseText, t.paper, 3],
   ['brace vs paper (UI border/focus, 3:1)', t.brace, t.paper, 3],
+  ['todo marker: brace on its 8% tint over surface', t.brace, mix(t.brace, t.surface, 0.08), 4.5],
   ['blush on paper (decor only)', t.blush, t.paper, 1],
 ];
 

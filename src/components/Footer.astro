@@ -19,7 +19,7 @@ const a = restaurant.address;
     </div>
 
     <div class="site-footer__grid">
-      <section aria-labelledby="f-where">
+      <div class="footer-col">
         <h2 id="f-where" class="label">{copy.footer.where}</h2>
         <address>
           {a.street}<br />
@@ -28,9 +28,9 @@ const a = restaurant.address;
             {copy.footer.openMap}<span class="sr-only"> {copy.tripadvisor.newTab}</span>
           </a>
         </address>
-      </section>
+      </div>
 
-      <section aria-labelledby="f-contacts">
+      <div class="footer-col">
         <h2 id="f-contacts" class="label">{copy.footer.contacts}</h2>
         <ul role="list">
           <li><a href={restaurant.phoneHref}>{restaurant.phone}</a></li>
@@ -41,9 +41,9 @@ const a = restaurant.address;
             </a>
           </li>
         </ul>
-      </section>
+      </div>
 
-      <section aria-labelledby="f-hours">
+      <div class="footer-col">
         <h2 id="f-hours" class="label">{copy.footer.hours}</h2>
         <p>{lang === 'it' ? `Chiuso il ${restaurant.closedDay}.` : `Closed on Tuesdays.`}</p>
         {
@@ -55,9 +55,9 @@ const a = restaurant.address;
             </p>
           )
         }
-      </section>
+      </div>
 
-      <section aria-labelledby="f-follow">
+      <div class="footer-col">
         <h2 id="f-follow" class="label">{copy.footer.follow}</h2>
         <ul role="list">
           <li>
@@ -82,7 +82,7 @@ const a = restaurant.address;
             }
           </li>
         </ul>
-      </section>
+      </div>
 
       <nav aria-labelledby="f-explore">
         <h2 id="f-explore" class="label">{copy.footer.explore}</h2>
@@ -109,6 +109,12 @@ const a = restaurant.address;
   }
   .site-footer a:hover {
     color: var(--night-accent);
+  }
+  /* Il marcatore TODO su superficie notte usa il caldo leggibile (5.2:1), non il brace da carta (2.8:1). */
+  .site-footer :global(.todo) {
+    color: var(--night-warn);
+    border-color: var(--night-warn);
+    background: transparent;
   }
   .site-footer :focus-visible {
     outline-color: var(--night-accent);
