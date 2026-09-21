@@ -3,8 +3,9 @@ import CtaBand from '../components/CtaBand.astro';
 import DishCard from '../components/DishCard.astro';
 import PageHero from '../components/PageHero.astro';
 import Sample from '../components/Sample.astro';
-import Todo from '../components/Todo.astro';
 import { menuCategories, menuIsSample } from '../data/menu';
+import PhotoFrame from '../components/PhotoFrame.astro';
+import { findPhoto } from '../lib/photo';
 import { restaurant } from '../data/restaurant';
 import { t, type Lang } from '../i18n';
 
@@ -20,18 +21,18 @@ const c = {
   title: 'Il menu',
   intro: 'Cucina libanese: mezze, grigliate, falafel e dolci.',
   navLabel: 'Categorie del menu',
+  dishEmpty: 'I piatti di questa categoria arrivano presto.',
   sampleNote: 'Menu dimostrativo con piatti tipici libanesi. I piatti e i prezzi reali arrivano dal cliente.',
   lunchTitle: 'Formula pranzo',
   lunchText: 'Piatto del giorno con bevanda inclusa — 15 € (da confermare).',
-  dishTodo: 'piatti, descrizioni e prezzi di questa categoria dal menu reale di Fairuz',
   dietTitle: 'Allergeni e diete',
-  dietTodo:
-    'informazioni su allergeni e diete (senza glutine, halal, vegane, vegetariane): da verificare e confermare con il cliente prima di mostrarle',
+  dietText: 'Hai allergie o intolleranze? Comunicalo al momento della prenotazione o al tavolo.',
   legacy: 'Nel frattempo il menu completo è consultabile sul sito attuale',
   legacyCta: 'Apri il menu attuale',
   newTab: copy.tripadvisor.newTab,
   bandTitle: 'Hai scelto? Ti aspettiamo a tavola.',
 };
+const hasLunchPhoto = Boolean(findPhoto('pranzo'));
 ---
 
 <PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
@@ -66,9 +67,7 @@ const c = {
             cat.items.map((dish) => <DishCard dish={dish} />)
           ) : (
             <DishCard>
-              <p>
-                <Todo>{c.dishTodo}</Todo>
-              </p>
+              <p>{c.dishEmpty}</p>
             </DishCard>
           )}
         </div>
@@ -79,9 +78,16 @@ const c = {
 
 <section class="section menu-lunch" aria-labelledby="lunch">
   <div class="container">
-    <div class="lunch-card">
-      <h2 id="lunch">{c.lunchTitle} <Sample /></h2>
-      <p>{c.lunchText}</p>
+    <div class:list={['lunch-card', { 'lunch-card--photo': hasLunchPhoto }]}>
+      <div class="lunch-card__text">
+        <h2 id="lunch">{c.lunchTitle} <Sample /></h2>
+        <p>{c.lunchText}</p>
+      </div>
+      {hasLunchPhoto && (
+        <div class="lunch-card__photo">
+          <PhotoFrame name="pranzo" alt="Locandina della formula Lunch Time: piatto con riso e spiedino, bevande incluse" />
+        </div>
+      )}
     </div>
   </div>
 </section>
@@ -89,7 +95,7 @@ const c = {
 <section class="section menu-diet" aria-labelledby="diet">
   <div class="container stack">
     <h2 id="diet">{c.dietTitle}</h2>
-    <p><Todo>{c.dietTodo}</Todo></p>
+    <p>{c.dietText}</p>
     <p>
       {c.legacy}:
       <a href={restaurant.legacySiteUrl} target="_blank" rel="noopener noreferrer">
@@ -185,6 +191,23 @@ const c = {
     background: var(--surface);
     border: var(--rule-w) solid var(--rule-strong);
     border-radius: var(--radius-md);
+  }
+  .lunch-card__text {
+    display: grid;
+    gap: var(--space-2);
+    align-content: center;
+  }
+  .lunch-card__photo {
+    --photo-ratio: 4 / 5;
+    width: 100%;
+    max-width: 18rem;
+  }
+  @media (min-width: 40rem) {
+    .lunch-card--photo {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: var(--space-6);
+    }
   }
   .lunch-card h2 {
     display: flex;

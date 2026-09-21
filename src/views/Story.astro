@@ -4,6 +4,7 @@ import PageHero from '../components/PageHero.astro';
 import PhotoFrame from '../components/PhotoFrame.astro';
 import Sample from '../components/Sample.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
+import { findPhoto } from '../lib/photo';
 import { pathFor, type Lang } from '../i18n';
 
 interface Props {
@@ -23,19 +24,22 @@ const c = {
       id: 'origini',
       kicker: 'Le origini',
       body: 'Fairuz nasce dal desiderio di portare a Parma la tavola libanese: quella in cui il cibo è prima di tutto un gesto di ospitalità. Ogni piatto racconta un pezzo di Mediterraneo, tra spezie, brace e pane condiviso.',
-      photo: 'foto reale: il locale',
+      file: 'locale',
+      alt: 'Il locale di Fairuz',
     },
     {
       id: 'cucina',
       kicker: 'La cucina',
       body: 'Tutto parte dalla brace e dalle mani: le mezze preparate ogni giorno, le grigliate marinate a lungo, i dolci che chiudono il pasto. Sapori tradizionali, senza scorciatoie, come si fa a casa.',
-      photo: 'foto reale: la cucina e i piatti',
+      file: 'tavola-iftar',
+      alt: 'Hummus e mezze su una tavola apparecchiata',
     },
     {
       id: 'persone',
       kicker: 'Le persone',
       body: 'Dietro ogni serata c’è chi accoglie in sala e chi lavora alla griglia. È da qui che nasce il modo di stare a tavola di Fairuz: senza fretta, come tra ospiti.',
-      photo: 'foto reale: il team',
+      file: 'chef-strada',
+      alt: 'Lo chef di Fairuz che prepara i piatti',
     },
   ],
   nameTitle: 'Il nome',
@@ -43,6 +47,7 @@ const c = {
   menuCta: 'Scopri il menu',
   bandTitle: 'La storia continua a tavola.',
 };
+const chapters = c.chapters.map((ch) => ({ ...ch, hasPhoto: Boolean(findPhoto(ch.file)) }));
 ---
 
 <PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
@@ -50,9 +55,9 @@ const c = {
 </PageHero>
 
 {
-  c.chapters.map((ch, i) => (
+  chapters.map((ch, i) => (
     <section class:list={['story', { 'story--flip': i % 2 === 1 }]} id={ch.id} aria-labelledby={`${ch.id}-title`}>
-      <div class="container story__grid">
+      <div class:list={['container story__grid', { 'story__grid--single': !ch.hasPhoto }]}>
         <div class="story__text">
           <p class="label label--link story__index">
             <span>{String(i + 1).padStart(2, '0')}</span>
@@ -61,9 +66,11 @@ const c = {
           <h2 id={`${ch.id}-title`}>{ch.kicker}</h2>
           <p class="story__body story__body--dropcap">{ch.body}</p>
         </div>
-        <div class="story__photo">
-          <PhotoFrame todo={ch.photo} />
-        </div>
+        {ch.hasPhoto && (
+          <div class="story__photo">
+            <PhotoFrame name={ch.file} alt={ch.alt} />
+          </div>
+        )}
       </div>
     </section>
   ))
@@ -111,6 +118,9 @@ const c = {
     border: var(--rule-w) solid currentColor;
     border-radius: var(--radius-pill);
   }
+  .story__grid--single .story__text {
+    max-width: 44rem;
+  }
   .story__photo {
     --photo-ratio: 4 / 3;
     width: 100%;
@@ -119,7 +129,7 @@ const c = {
   }
 
   @media (min-width: 60rem) {
-    .story__grid {
+    .story__grid:not(.story__grid--single) {
       grid-template-columns: 1fr 1fr;
       gap: var(--space-8);
     }

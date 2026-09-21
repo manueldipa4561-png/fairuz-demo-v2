@@ -4,7 +4,6 @@
  * Nessuna citazione, nessun aggregateRating nello schema (regola 2). Le stelle sono una resa grafica del 4,7.
  */
 import { restaurant } from '../data/restaurant';
-import Todo from './Todo.astro';
 import { t, type Lang } from '../i18n';
 
 interface Props {
@@ -21,7 +20,6 @@ const star = '10,1.5 12.6,7.3 19,7.9 14.2,12.1 15.6,18.4 10,15.1 4.4,18.4 5.8,12
 const c = {
   eyebrow: 'Recensioni',
   title: 'Cosa ne pensano gli ospiti',
-  todo: 'recensioni scelte da citare: solo con il consenso degli autori, da selezionare con il cliente',
 };
 ---
 
@@ -36,7 +34,6 @@ const c = {
           {tripadvisor.cta}<span class="sr-only"> {tripadvisor.newTab}</span>
         </a>
       </p>
-      <p><Todo>{c.todo}</Todo></p>
     </div>
 
     <div class="reviews__score" role="img" aria-label={`${score} su 5`}>

@@ -7,7 +7,8 @@
  * Progressive enhancement: senza JS il modulo è nascosto (html:not(.js)) e resta l'alternativa WhatsApp/telefono.
  */
 import { restaurant } from '../data/restaurant';
-import Todo from './Todo.astro';
+import Sample from './Sample.astro';
+import { hoursAreSample, sampleHours } from '../data/hours';
 
 const c = {
   demo: 'Demo',
@@ -19,7 +20,7 @@ const c = {
   phone: 'Telefono',
   notes: 'Note',
   optional: 'facoltative',
-  timeTodo: 'fasce orarie di servizio da confermare',
+  timeHint: `Servizio ${sampleHours.lunch} e ${sampleHours.dinner}`,
   submit: 'Richiedi il tavolo',
   less: 'Una persona in meno',
   more: 'Una persona in più',
@@ -30,7 +31,6 @@ const c = {
   resultTime: 'Ora',
   resultPeople: 'Persone',
   resultName: 'Nome',
-  resultTodo: 'invio reale e conferma della prenotazione: da collegare al sistema del cliente',
   whatsapp: 'Continua su WhatsApp',
   edit: 'Modifica',
   newTab: '(si apre in una nuova scheda)',
@@ -61,7 +61,7 @@ const c = {
       <div class="field">
         <label for="b-time">{c.time}</label>
         <input id="b-time" name="time" type="time" required aria-describedby="b-time-hint b-time-err" />
-        <p class="field__hint" id="b-time-hint"><Todo>{c.timeTodo}</Todo></p>
+        <p class="field__hint" id="b-time-hint">{hoursAreSample && <Sample />} {c.timeHint}</p>
         <p class="field__error" id="b-time-err"></p>
       </div>
       <div class="field">
@@ -127,7 +127,6 @@ const c = {
       <div><dt>{c.resultPeople}</dt><dd data-out="people"></dd></div>
       <div><dt>{c.resultName}</dt><dd data-out="name"></dd></div>
     </dl>
-    <p><Todo>{c.resultTodo}</Todo></p>
     <div class="actions">
       <a class="btn btn--primary" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer" data-wa-link>
         {c.whatsapp}<span class="sr-only"> {c.newTab}</span>

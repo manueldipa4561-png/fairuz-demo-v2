@@ -2,9 +2,9 @@
 import BookingForm from '../components/BookingForm.astro';
 import PageHero from '../components/PageHero.astro';
 import ReviewsProof from '../components/ReviewsProof.astro';
-import Todo from '../components/Todo.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
 import Sample from '../components/Sample.astro';
+import { hoursAreSample, sampleHours } from '../data/hours';
 import { restaurant } from '../data/restaurant';
 import { t, type Lang } from '../i18n';
 
@@ -25,16 +25,15 @@ const c = {
   where: 'Dove siamo',
   map: 'Apri la mappa',
   directions: 'Indicazioni stradali',
-  mapTodo: 'mappa incorporata: servono le coordinate del locale',
   contacts: 'Contatti',
   whatsapp: copy.footer.whatsapp,
   hours: 'Orari',
   closedLabel: 'Martedì',
   closed: 'Chiuso',
-  lunchLabel: 'Mer – Lun · Pranzo',
-  lunchHours: '12:00 – 14:30',
-  dinnerLabel: 'Mer – Lun · Cena',
-  dinnerHours: '19:00 – 23:00',
+  lunchLabel: `${sampleHours.days} · Pranzo`,
+  lunchHours: sampleHours.lunch,
+  dinnerLabel: `${sampleHours.days} · Cena`,
+  dinnerHours: sampleHours.dinner,
   services: 'Servizi',
   // Servizi dichiarati sul sito attuale del ristorante (fairuz.eatbu.com).
   list: [
@@ -88,13 +87,12 @@ const c = {
           {c.directions}<span class="sr-only"> {c.newTab}</span>
         </a>
       </p>
-      <p><Todo>{c.mapTodo}</Todo></p>
     </div>
 
     <div class="facts visit__facts">
       <div>
         <h3>{c.hours}</h3>
-        <p class="hours-note"><Sample /> orari dimostrativi, da confermare</p>
+        {hoursAreSample && <p class="hours-note"><Sample /> orari dimostrativi</p>}
         <dl class="hours">
           <div>
             <dt>{c.lunchLabel}</dt>

@@ -1,41 +1,25 @@
 ---
 /**
- * Cornice per una foto reale di Fairuz (regola 9: solo immagini di Fairuz, con OK dell'utente).
- *
- * Basta mettere il file in `public/photos/<nome>.(png|jpg|jpeg|webp)` e ricostruire: la cornice lo trova
- * da sola (build-time) e mostra la foto. Se il file non c'è, resta il segnaposto `<Todo>`.
+ * Cornice per una foto reale di Fairuz. Mostra la foto se il file esiste in `public/photos`
+ * (vedi src/lib/photo.ts); altrimenti non renderizza nulla: chi la usa decide l'impaginato senza foto.
  * Le proporzioni vengono da `--photo-ratio` (impostata da chi usa il componente).
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import Todo from './Todo.astro';
+import { findPhoto } from '../lib/photo';
 
 interface Props {
-  /** Testo del segnaposto quando la foto non c'è ancora. */
-  todo: string;
   /** Nome del file in /public/photos senza estensione (es. "barbecue"). */
   name?: string;
   /** Testo alternativo descrittivo per chi non vede la foto. */
   alt?: string;
 }
-const { todo, name, alt = '' } = Astro.props;
-
-const exts = ['png', 'jpg', 'jpeg', 'webp'];
-const photosDir = path.join(process.cwd(), 'public', 'photos');
-const file = name ? exts.map((e) => `${name}.${e}`).find((f) => fs.existsSync(path.join(photosDir, f))) : undefined;
-const src = file ? `/photos/${file}` : undefined;
+const { name, alt = '' } = Astro.props;
+const src = findPhoto(name);
 ---
 
 {
-  src ? (
-    <figure class="photo-frame photo-frame--filled">
-      <img src={src} alt={alt} loading="lazy" decoding="async" />
-    </figure>
-  ) : (
+  src && (
     <figure class="photo-frame">
-      <figcaption>
-        <Todo>{todo}</Todo>
-      </figcaption>
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
     </figure>
   )
 }
@@ -43,38 +27,21 @@ const src = file ? `/photos/${file}` : undefined;
 <style>
   .photo-frame {
     position: relative;
-    display: grid;
-    place-items: center;
     width: 100%;
     aspect-ratio: var(--photo-ratio, 4 / 3);
-    padding: var(--space-5);
     border: var(--rule-w) solid currentColor;
-    background: repeating-linear-gradient(
-      -45deg,
-      transparent 0 10px,
-      color-mix(in srgb, currentColor 7%, transparent) 10px 11px
-    );
-    text-align: center;
+    overflow: hidden;
   }
+  /* Filetto interno chiaro: eco delle carte stampate, resta leggibile su qualsiasi foto. */
   .photo-frame::before {
     content: '';
     position: absolute;
     inset: var(--space-2);
-    border: var(--rule-w) solid color-mix(in srgb, currentColor 35%, transparent);
+    border: var(--rule-w) solid color-mix(in srgb, #fff 70%, transparent);
     pointer-events: none;
-  }
-  /* Con la foto: niente tratteggio, la foto riempie la cornice mantenendo le proporzioni. */
-  .photo-frame--filled {
-    padding: 0;
-    background: none;
-    overflow: hidden;
-  }
-  .photo-frame--filled::before {
-    inset: var(--space-2);
-    border-color: color-mix(in srgb, #fff 70%, transparent);
     z-index: 1;
   }
-  .photo-frame--filled img {
+  .photo-frame img {
     width: 100%;
     height: 100%;
     object-fit: cover;
