@@ -20,7 +20,7 @@ const c = {
     contacts: 'Contatti',
     whatsapp: 'Scrivici su WhatsApp',
     hours: 'Orari',
-    hoursTodo: 'orari reali (giorni, pranzo e cena, chiusura settimanale) da confermare',
+    hoursTodo: 'fasce orarie di pranzo e cena da confermare',
     services: 'Servizi',
     // Servizi dichiarati sul sito attuale del ristorante (fairuz.eatbu.com).
     list: ['Aria condizionata', 'Parcheggio non custodito', 'Accessibile', 'Wi-Fi gratuito', 'Animali domestici ammessi', 'Take away'],
@@ -84,6 +84,7 @@ const c = {
     </div>
     <div>
       <h3>{c.hours}</h3>
+      <p>{lang === 'it' ? `Chiuso il ${restaurant.closedDay}.` : 'Closed on Tuesdays.'}</p>
       <p><Todo>{c.hoursTodo}</Todo></p>
     </div>
     <div>

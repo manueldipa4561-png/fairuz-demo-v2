@@ -45,12 +45,13 @@ const a = restaurant.address;
 
       <section aria-labelledby="f-hours">
         <h2 id="f-hours" class="label">{copy.footer.hours}</h2>
+        <p>{lang === 'it' ? `Chiuso il ${restaurant.closedDay}.` : `Closed on Tuesdays.`}</p>
         {
           restaurant.hours ? (
             <p>{restaurant.hours}</p>
           ) : (
             <p>
-              <Todo>{lang === 'it' ? 'orari reali da confermare' : 'real opening hours to confirm'}</Todo>
+              <Todo>{lang === 'it' ? 'fasce orarie di pranzo e cena da confermare' : 'lunch and dinner hours to confirm'}</Todo>
             </p>
           )
         }

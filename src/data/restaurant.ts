@@ -17,19 +17,22 @@ export const restaurant = {
   phone: '+39 371 588 1368',
   phoneHref: 'tel:+393715881368',
   email: 'fairuzparmasrl@gmail.com',
-  // TODO: confermare con il cliente che questo numero riceve messaggi WhatsApp.
+  // Verificato: una locandina dell'account Instagram ufficiale (10/09/2026) riporta "TEL WA +39 371 588 1368".
   whatsappHref: 'https://wa.me/393715881368',
   mapsHref: 'https://www.google.com/maps/search/?api=1&query=Fairuz+Via+Luigi+Vigotti+5+43126+Parma',
   social: {
     facebook: 'https://www.facebook.com/fairuz.ristorante.parma/',
-    instagram: null as string | null, // TODO: handle Instagram ufficiale da confermare
+    // Verificato: profilo ufficiale "Fairuz 🇱🇧 Ristorante Libanese a Parma" (21/09/2026: 66 post, ~3.700 follower).
+    instagram: 'https://www.instagram.com/fairuz.ristorante.parma/' as string | null,
   },
   tripadvisor: {
     url: 'https://www.tripadvisor.com/Restaurant_Review-g187804-d23611904-Reviews-Fairuz_Parma-Parma_Province_of_Parma_Emilia_Romagna.html',
     rating: 4.7,
     reviewsAtLeast: 150,
   },
-  /** TODO: orari reali (il sito attuale mostra solo "Siamo chiusi / Cucina aperta" senza fasce). */
+  /** Verificato: la bio Instagram ufficiale dice "Giorno di chiusura: martedì". */
+  closedDay: 'martedì',
+  /** TODO: fasce orarie reali di pranzo/cena (il sito attuale mostra solo "Siamo chiusi / Cucina aperta"). */
   hours: null as null | string,
   /** TODO: coordinate per lo schema e la mappa incorporata. */
   geo: null as null | { lat: number; lng: number },
