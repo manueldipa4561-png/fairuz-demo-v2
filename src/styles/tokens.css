@@ -1,0 +1,125 @@
+/*
+ * Fairuz — design tokens · Direzione D "Turchese & Carta"
+ * Tutti i contrasti sono verificati con `node scripts/contrast.mjs` (WCAG 2.x).
+ *
+ * Regole d'uso (importanti):
+ *  - --turquoise  = firma del brand (dal nome Fairuz = turchese). Solo RIEMPIMENTI e decoro,
+ *                   sempre con testo --ink (mai bianco: 3.3:1). Su carta NON è usabile come testo/bordo (2.8:1).
+ *  - --link       = turchese profondo per link, etichette, anello di focus e bordi UI su carta (4.8:1).
+ *  - --brace      = fuoco/CTA. Testo bianco su brace = 5.7:1. Anche come testo su carta (4.9:1).
+ *  - --blush      = solo decoro (1.5:1 su carta): tag, filetti, campiture. Mai per testo.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* ── Colore · tema chiaro (carta) ───────────────────────────── */
+  --paper: #f4ecdd;
+  --surface: #fbf7ef;
+  --ink: #1e1b18;
+  --ink-soft: #5a5048;
+  --turquoise: #1e9e93;
+  --link: #14746b;
+  --brace: #b93826;
+  --on-brace: #ffffff;
+  --blush: #d3bdc5;
+  /* Superfici "notte" (footer, capitoli fuoco/fumo della home): identiche in ENTRAMBI i temi. */
+  --night: #1e1b18;
+  --night-fg: #f4ecdd;
+  --night-accent: #3cc4b7;
+  --rule: color-mix(in srgb, var(--ink) 22%, transparent);
+  --rule-strong: var(--ink);
+  --focus-ring: var(--link);
+  --shadow-soft: 0 1px 0 rgb(30 27 24 / 0.06), 0 12px 32px -16px rgb(30 27 24 / 0.28);
+
+  /* ── Tipografia ─────────────────────────────────────────────── */
+  --font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-body: 'Karla Variable', 'Karla', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Scala fluida mobile-first (clamp: min @375px → max @1440px) */
+  --step--2: clamp(0.75rem, 0.73rem + 0.1vw, 0.8125rem); /* etichette mono */
+  --step--1: clamp(0.875rem, 0.85rem + 0.12vw, 0.9375rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem); /* corpo */
+  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.125rem);
+  --step-3: clamp(2rem, 1.6rem + 2vw, 3.25rem);
+  --step-4: clamp(2.5rem, 1.8rem + 3.5vw, 4.75rem);
+  --step-5: clamp(3.25rem, 2rem + 6.2vw, 8rem);
+  --step-wordmark: clamp(3.25rem, 16.5vw, 15rem); /* "FAIRUZ": ~4.15em di larghezza, entra sempre nel frame */
+
+  --lh-tight: 1.02;
+  --lh-snug: 1.2;
+  --lh-body: 1.6;
+  --tracking-label: 0.14em;
+
+  /* ── Spaziature (base 4px) ──────────────────────────────────── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 7rem;
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --section-y: clamp(4rem, 2.5rem + 7vw, 9rem);
+  --container: 80rem;
+  --measure: 62ch;
+
+  /* ── Forme ──────────────────────────────────────────────────── */
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+  --rule-w: 1px;
+
+  /* ── Movimento (vapore, fuoco, ospitalità lenta) ────────────── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 160ms;
+  --dur-base: 320ms;
+  --dur-slow: 720ms;
+
+  /* ── Layout ─────────────────────────────────────────────────── */
+  --touch-min: 2.75rem; /* 44px: target minimo touch */
+  --header-h: 4.5rem;
+  --z-header: 50;
+  --z-menu: 60;
+  --z-skip: 100;
+}
+
+/* ── Tema scuro: segue il sistema, oppure forzato con data-theme ── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #171310;
+    --surface: #221d19;
+    --ink: #f4ecdd;
+    --ink-soft: #b9ac9d;
+    --turquoise: #3cc4b7;
+    --link: #4fd1c5;
+    --brace: #e5674f;
+    --on-brace: #171310;
+    --shadow-soft: 0 1px 0 rgb(0 0 0 / 0.4), 0 14px 34px -16px rgb(0 0 0 / 0.7);
+  }
+}
+:root[data-theme='dark'] {
+  --paper: #171310;
+  --surface: #221d19;
+  --ink: #f4ecdd;
+  --ink-soft: #b9ac9d;
+  --turquoise: #3cc4b7;
+  --link: #4fd1c5;
+  --brace: #e5674f;
+  --on-brace: #171310;
+  --shadow-soft: 0 1px 0 rgb(0 0 0 / 0.4), 0 14px 34px -16px rgb(0 0 0 / 0.7);
+}
+
+/* prefers-reduced-motion: azzera le durate; le animazioni GSAP leggeranno la stessa media query */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur-base: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+}
