@@ -24,6 +24,11 @@ Tutto ciò che in questa demo compare come **TODO** (riquadro tratteggiato) va c
 - [ ] **Origine del nome "Fairuz"** (non dedurla).
 - [ ] Foto reali di locale, cucina, persone, piatti (nucleo visivo del sito). Sostituire `public/og-default.png`.
 
+## Home cinematica (Fase 2)
+- [ ] **Foto per i 5 capitoli** (oggi cornici TODO con proporzioni fisse 4:5 desktop / 4:3 mobile): griglia accesa (BRACE), cucina al lavoro (FUMO), pane e mezze (PANE), tavola imbandita (TAVOLA), la sala (PRENOTA).
+- [ ] **Testi dei capitoli** da far approvare: sono evocativi e non contengono fatti nuovi, ma il cliente deve riconoscersi nel tono (`src/views/Home.astro`, oggetto `ch`).
+- [ ] Illustrazioni a china: quelle attuali sono SVG disegnati per la demo; valutare se commissionarne di definitive.
+
 ## Proposte NON confermate (approvate come sezioni dimostrative, marcate TODO)
 - [ ] Gift card / buoni regalo
 - [ ] Catering & eventi privati

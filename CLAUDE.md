@@ -12,6 +12,7 @@ Astro 7 (statico, deploy Netlify) · GSAP + ScrollTrigger + Lenis (solo home cin
 - `src/data/restaurant.ts` — dati VERIFICATI del ristorante; ciò che manca è `null`.
 - `src/layouts/BaseLayout.astro` — head SEO (canonical, hreflang, OG, robots, JSON-LD), skip link, strip demo, header, footer.
 - `src/views/*.astro` — contenuto di ogni pagina (prop `lang`); `src/pages/**` sono wrapper sottili IT/EN.
+- `src/scripts/motion.ts` — bootstrap GSAP/ScrollTrigger/SplitText/Lenis con `gsap.matchMedia()` (reduced-motion = niente). `src/scripts/home.ts` — timeline della home; `src/components/home/*` — capitoli, sigillo, rombi, disegni SVG.
 - `scripts/contrast.mjs` — verifica WCAG dei token. Va rieseguito a ogni modifica di colore.
 
 ## Regole non negoziabili
@@ -30,7 +31,7 @@ Astro 7 (statico, deploy Netlify) · GSAP + ScrollTrigger + Lenis (solo home cin
 
 ## Stato fasi
 - [x] Fase 1 — struttura, tokens, shell, i18n, SEO, badge demo
-- [ ] Fase 2 — home cinematica scroll-driven (GSAP+Lenis) — **Opus, plan mode**
+- [x] Fase 2 — home cinematica scroll-driven (GSAP+Lenis): capitoli BRACE → FUMO → PANE → TAVOLA → PRENOTA
 - [ ] Fase 3 — pagine Menu, Eventi & Esperienze (punta), Storia, Visita
 - [ ] Fase 4 — prenotazione demo + recensioni + micro-interazioni
 - [ ] Fase 5 — QA (Lighthouse, a11y, cross-device) e deploy
