@@ -279,6 +279,13 @@ a.card:hover {
   color: var(--paper);
 }
 
+/* Gruppo di pulsanti affiancati (poi a capo su mobile) */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
 /* ── Marcatore TODO ben visibile (contenuti mancanti, mai inventati) ── */
 .todo {
   display: inline-block;

@@ -1,0 +1,42 @@
+---
+/**
+ * Cornice per una foto reale che manca ancora (regola 9: solo foto di Fairuz, con OK dell'utente).
+ * Proporzioni da `--photo-ratio` (ereditata: chi la usa la imposta sul contenitore), così l'impaginato
+ * non cambia quando arriva la foto. Colori da `currentColor`: funziona su carta, notte e brace.
+ */
+import Todo from './Todo.astro';
+
+interface Props {
+  todo: string;
+}
+const { todo, ...rest } = Astro.props;
+---
+
+<figure class="photo-frame" {...rest}>
+  <figcaption><Todo>{todo}</Todo></figcaption>
+</figure>
+
+<style>
+  .photo-frame {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: var(--photo-ratio, 4 / 3);
+    padding: var(--space-5);
+    border: var(--rule-w) solid currentColor;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent 0 10px,
+      color-mix(in srgb, currentColor 7%, transparent) 10px 11px
+    );
+    text-align: center;
+  }
+  .photo-frame::before {
+    content: '';
+    position: absolute;
+    inset: var(--space-2);
+    border: var(--rule-w) solid color-mix(in srgb, currentColor 35%, transparent);
+    pointer-events: none;
+  }
+</style>

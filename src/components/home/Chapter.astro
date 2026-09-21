@@ -3,7 +3,7 @@
  * Capitolo della home cinematica. La parola gigante è il vero <h2> della sezione.
  * Slot: default = testo, "art" = disegno SVG. `photoTodo` crea la cornice per la foto reale (manca ancora).
  */
-import Todo from '../Todo.astro';
+import PhotoFrame from '../PhotoFrame.astro';
 
 interface Props {
   id: string;
@@ -36,11 +36,9 @@ const { id, index, kicker, word, tone = 'paper', pin = false, photoTodo } = Astr
       <div class="chapter__art"><slot name="art" /></div>
       {
         photoTodo && (
-          <figure class="chapter__photo" data-chapter-photo>
-            <figcaption>
-              <Todo>{photoTodo}</Todo>
-            </figcaption>
-          </figure>
+          <div class="chapter__photo" data-chapter-photo>
+            <PhotoFrame todo={photoTodo} />
+          </div>
         )
       }
     </div>
@@ -118,28 +116,10 @@ const { id, index, kicker, word, tone = 'paper', pin = false, photoTodo } = Astr
   }
   /* Cornice pronta per la foto reale (stesse proporzioni: l'impaginato non cambierà). */
   .chapter__photo {
-    position: relative;
-    display: grid;
-    place-items: center;
-    aspect-ratio: 4 / 3;
+    --photo-ratio: 4 / 3;
     width: 100%;
     max-width: 22rem;
     justify-self: center;
-    padding: var(--space-5);
-    border: var(--rule-w) solid currentColor;
-    background: repeating-linear-gradient(
-      -45deg,
-      transparent 0 10px,
-      color-mix(in srgb, currentColor 7%, transparent) 10px 11px
-    );
-    text-align: center;
-  }
-  .chapter__photo::before {
-    content: '';
-    position: absolute;
-    inset: var(--space-2);
-    border: var(--rule-w) solid color-mix(in srgb, currentColor 35%, transparent);
-    pointer-events: none;
   }
 
   /* Superfici scure/brace: link, focus, pulsanti e TODO devono restare leggibili. */
@@ -183,7 +163,7 @@ const { id, index, kicker, word, tone = 'paper', pin = false, photoTodo } = Astr
       grid-template-columns: 5fr 4fr 3fr;
     }
     .chapter__photo {
-      aspect-ratio: 4 / 5;
+      --photo-ratio: 4 / 5;
       max-width: none;
     }
   }

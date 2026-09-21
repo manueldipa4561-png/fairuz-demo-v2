@@ -1,0 +1,56 @@
+---
+/** Fascia di chiusura pagina: prenota + WhatsApp (numero verificato). Turchese pieno, testo scuro fisso (regola 5). */
+import { restaurant } from '../data/restaurant';
+import { pathFor, t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  text?: string;
+}
+const { lang, title, text } = Astro.props;
+const copy = t(lang);
+---
+
+<section class="band" aria-labelledby="band-title">
+  <div class="container band__inner">
+    <h2 id="band-title">{title}</h2>
+    {text && <p>{text}</p>}
+    <div class="actions">
+      <a class="btn btn--primary" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.book}</a>
+      <a class="btn btn--ghost" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer">
+        {copy.footer.whatsapp}<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    background: var(--turquoise);
+    color: var(--night);
+    padding-block: var(--space-8);
+  }
+  .band__inner {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+  .band h2 {
+    color: inherit;
+  }
+  .band p {
+    color: inherit;
+  }
+  .band :global(.btn--ghost) {
+    color: var(--night);
+    border-color: var(--night);
+  }
+  .band :global(.btn--ghost:hover) {
+    background: var(--night);
+    color: var(--turquoise);
+  }
+  .band :global(:focus-visible) {
+    outline-color: var(--night);
+  }
+</style>
