@@ -1,0 +1,29 @@
+---
+/** Fumo: volute che salgono dalla griglia. Il gruppo `data-smoke` deriva verso l'alto durante lo scroll. */
+---
+
+<svg class="art" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+  <g class="art__ink">
+    <g data-smoke>
+      <path data-draw pathLength="1" d="M200 350 C170 310 230 282 200 244 C170 206 230 178 200 140 C176 110 206 82 190 50"></path>
+      <path data-draw pathLength="1" d="M160 352 C140 324 180 296 160 266 C140 236 176 212 158 182 C148 164 160 148 152 132"></path>
+      <path data-draw pathLength="1" d="M240 352 C262 322 222 294 244 262 C266 230 228 204 250 172 C266 148 250 126 262 102"></path>
+      <path class="art__faint" data-draw pathLength="1" d="M128 300 C116 280 136 262 126 240"></path>
+      <path class="art__faint" data-draw pathLength="1" d="M276 290 C290 270 270 252 284 230"></path>
+    </g>
+    <path data-draw pathLength="1" d="M110 366 H290 M130 378 H270"></path>
+  </g>
+</svg>
+
+<style>
+  .art__ink {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .art__faint {
+    stroke: var(--night-accent);
+  }
+</style>

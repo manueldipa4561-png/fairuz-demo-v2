@@ -1,0 +1,59 @@
+---
+/**
+ * Sigillo "FAIRUZ · PARMA · CUCINA LIBANESE" (reinterpretazione del timbro del riferimento Da Maria).
+ * Decorativo. Riempimento turchese + testo scuro fisso (--night): leggibile in entrambi i temi (regola 5).
+ */
+const track = `seal-track-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg class="seal" viewBox="0 0 200 200" aria-hidden="true" focusable="false" data-seal>
+  <defs>
+    <path id={track} d="M100,100 m-72,0 a72,72 0 1,1 144,0 a72,72 0 1,1 -144,0"></path>
+  </defs>
+  <circle class="seal__disc" cx="100" cy="100" r="98"></circle>
+  <circle class="seal__line" cx="100" cy="100" r="90"></circle>
+  <circle class="seal__line" cx="100" cy="100" r="54"></circle>
+  <g class="seal__ring">
+    <text class="seal__text">
+      <textPath href={`#${track}`} textLength="448" lengthAdjust="spacing">
+        FAIRUZ · PARMA · CUCINA LIBANESE ·
+      </textPath>
+    </text>
+  </g>
+  <path class="seal__mark" d="M100 72 L120 100 L100 128 L80 100 Z"></path>
+  <path class="seal__line" d="M100 84 L111 100 L100 116 L89 100 Z"></path>
+</svg>
+
+<style>
+  .seal {
+    width: 100%;
+    height: auto;
+  }
+  .seal__disc {
+    fill: var(--turquoise);
+  }
+  .seal__line {
+    fill: none;
+    stroke: var(--night);
+    stroke-width: 1.5;
+  }
+  .seal__mark {
+    fill: var(--night);
+  }
+  .seal__text {
+    fill: var(--night);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .seal__ring {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+    animation: seal-spin 40s linear infinite;
+  }
+  @keyframes seal-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
