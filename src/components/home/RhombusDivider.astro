@@ -1,0 +1,40 @@
+---
+/** Fascia a rombi (motivo già presente sul sito attuale di Fairuz), turchese + blush. Decorativa. */
+interface Props {
+  /** Sfondo su cui poggia la fascia, per raccordare due sezioni di colore diverso. */
+  tone?: 'paper' | 'night';
+}
+const { tone = 'paper' } = Astro.props;
+const pid = `rhombi-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class:list={['rhombi', `rhombi--${tone}`]} aria-hidden="true">
+  <svg width="100%" height="20" focusable="false">
+    <defs>
+      <pattern id={pid} width="40" height="20" patternUnits="userSpaceOnUse">
+        <path class="rhombi__a" d="M0 10 L10 0 L20 10 L10 20 Z"></path>
+        <path class="rhombi__b" d="M20 10 L30 0 L40 10 L30 20 Z"></path>
+      </pattern>
+    </defs>
+    <rect width="100%" height="20" fill={`url(#${pid})`}></rect>
+  </svg>
+</div>
+
+<style>
+  .rhombi {
+    background: var(--paper);
+    padding-block: var(--space-2);
+  }
+  .rhombi--night {
+    background: var(--night);
+  }
+  .rhombi svg {
+    display: block;
+  }
+  .rhombi__a {
+    fill: var(--turquoise);
+  }
+  .rhombi__b {
+    fill: var(--blush);
+  }
+</style>

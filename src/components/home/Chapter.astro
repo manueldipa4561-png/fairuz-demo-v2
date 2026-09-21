@@ -1,0 +1,170 @@
+---
+/**
+ * Capitolo della home cinematica. La parola gigante è il vero <h2> della sezione.
+ * Slot: default = testo, "art" = disegno SVG. `photoTodo` crea la cornice per la foto reale (manca ancora).
+ */
+import PhotoFrame from '../PhotoFrame.astro';
+
+interface Props {
+  id: string;
+  index: string;
+  kicker: string;
+  word: string;
+  tone?: 'paper' | 'night' | 'brace';
+  /** Pinnato durante lo scroll su desktop (home.ts). */
+  pin?: boolean;
+  photoTodo?: string;
+}
+const { id, index, kicker, word, tone = 'paper', pin = false, photoTodo } = Astro.props;
+---
+
+<section
+  class:list={['chapter', `chapter--${tone}`]}
+  id={id}
+  aria-labelledby={`${id}-title`}
+  data-chapter={id}
+  data-pin={pin ? '' : undefined}
+>
+  <div class="container chapter__inner">
+    <p class="label chapter__kicker" data-chapter-kicker>
+      <span class="chapter__index">{index}</span>
+      <span>{kicker}</span>
+    </p>
+    <h2 class="chapter__word" id={`${id}-title`} data-chapter-word>{word}</h2>
+    <div class="chapter__grid">
+      <div class="chapter__text" data-chapter-text><slot /></div>
+      <div class="chapter__art"><slot name="art" /></div>
+      {
+        photoTodo && (
+          <div class="chapter__photo" data-chapter-photo>
+            <PhotoFrame todo={photoTodo} />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .chapter {
+    position: relative;
+    padding-block: var(--section-y);
+    overflow: clip;
+    background: var(--paper);
+    color: var(--ink);
+    --chapter-accent: var(--link);
+  }
+  .chapter--night {
+    background: var(--night);
+    color: var(--night-fg);
+    --chapter-accent: var(--night-accent);
+  }
+  .chapter--brace {
+    background: var(--brace);
+    color: var(--on-brace);
+    --chapter-accent: var(--on-brace);
+  }
+  .chapter__inner {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .chapter__kicker {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--chapter-accent);
+  }
+  .chapter__index {
+    padding: 0.1em 0.6em;
+    border: var(--rule-w) solid currentColor;
+    border-radius: var(--radius-pill);
+  }
+  .chapter__word {
+    font-size: var(--step-chapter);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: inherit;
+  }
+  .chapter__grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+    margin-top: var(--space-4);
+  }
+  .chapter__text {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+  .chapter__text :global(.lead) {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-2);
+    line-height: var(--lh-snug);
+  }
+  .chapter__art {
+    width: 100%;
+    max-width: 26rem;
+    justify-self: center;
+  }
+  .chapter__art :global(svg) {
+    width: 100%;
+    max-height: 42svh;
+  }
+  /* Cornice pronta per la foto reale (stesse proporzioni: l'impaginato non cambierà). */
+  .chapter__photo {
+    --photo-ratio: 4 / 3;
+    width: 100%;
+    max-width: 22rem;
+    justify-self: center;
+  }
+
+  /* Superfici scure/brace: link, focus, pulsanti e TODO devono restare leggibili. */
+  .chapter--night :global(a:not(.btn)),
+  .chapter--brace :global(a:not(.btn)) {
+    color: var(--chapter-accent);
+  }
+  .chapter--night :global(:focus-visible),
+  .chapter--brace :global(:focus-visible) {
+    outline-color: var(--chapter-accent);
+  }
+  .chapter--night :global(.btn--ghost),
+  .chapter--brace :global(.btn--ghost) {
+    color: inherit;
+    border-color: currentColor;
+  }
+  .chapter--night :global(.btn--ghost:hover) {
+    background: var(--night-fg);
+    color: var(--night);
+  }
+  .chapter--brace :global(.btn--ghost:hover) {
+    background: var(--on-brace);
+    color: var(--brace);
+  }
+  .chapter--night :global(.todo) {
+    color: var(--night-warn);
+    border-color: var(--night-warn);
+    background: transparent;
+  }
+  .chapter--brace :global(.todo) {
+    color: var(--on-brace);
+    border-color: var(--on-brace);
+    background: transparent;
+  }
+
+  @media (min-width: 60rem) {
+    .chapter[data-pin] {
+      padding-block: var(--space-8);
+    }
+    .chapter__grid {
+      grid-template-columns: 5fr 4fr 3fr;
+    }
+    .chapter__photo {
+      --photo-ratio: 4 / 5;
+      max-width: none;
+    }
+  }
+</style>

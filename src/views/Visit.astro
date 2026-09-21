@@ -1,0 +1,181 @@
+---
+import BookingForm from '../components/BookingForm.astro';
+import PageHero from '../components/PageHero.astro';
+import ReviewsProof from '../components/ReviewsProof.astro';
+import Todo from '../components/Todo.astro';
+import RhombusDivider from '../components/home/RhombusDivider.astro';
+import { restaurant } from '../data/restaurant';
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const copy = t(lang);
+const a = restaurant.address;
+
+// Solo italiano (regola 8): l'inglese si riattiva riscrivendo questo blocco per lingua.
+const c = {
+  eyebrow: 'Visita & Prenota',
+  title: 'Visita & Prenota',
+  intro: 'Vieni a trovarci in Via Luigi Vigotti, a Parma.',
+  bookTitle: 'Prenota un tavolo',
+  altTitle: 'Preferisci scrivere o chiamare?',
+  where: 'Dove siamo',
+  map: 'Apri la mappa',
+  directions: 'Indicazioni stradali',
+  mapTodo: 'mappa incorporata: servono le coordinate del locale',
+  contacts: 'Contatti',
+  whatsapp: copy.footer.whatsapp,
+  hours: 'Orari',
+  closedLabel: 'Martedì',
+  closed: 'Chiuso',
+  otherDaysLabel: 'Altri giorni',
+  hoursTodo: 'fasce orarie di pranzo e cena da confermare',
+  services: 'Servizi',
+  // Servizi dichiarati sul sito attuale del ristorante (fairuz.eatbu.com).
+  list: [
+    'Aria condizionata',
+    'Parcheggio non custodito',
+    'Accessibile',
+    'Wi-Fi gratuito',
+    'Animali domestici ammessi',
+    'Take away',
+  ],
+  newTab: copy.tripadvisor.newTab,
+};
+---
+
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+
+<section class="section" id="prenota" aria-labelledby="prenota-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="prenota-title">{c.bookTitle}</h2>
+    </div>
+    <BookingForm />
+    <p class="label label--link visit-alt">{c.altTitle}</p>
+    <p class="actions visit-book-actions">
+      <a class="btn btn--ghost" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer">
+        {c.whatsapp}<span class="sr-only"> {c.newTab}</span>
+      </a>
+      <a class="btn btn--ghost" href={restaurant.phoneHref}>{restaurant.phone}</a>
+    </p>
+  </div>
+</section>
+
+<ReviewsProof lang={lang} />
+
+<RhombusDivider />
+
+<section class="section" aria-labelledby="dove">
+  <div class="container visit">
+    <div class="visit__map">
+      <h2 id="dove">{c.where}</h2>
+      <address>
+        <strong>{restaurant.name}</strong><br />
+        {a.street}<br />
+        {a.postalCode} {a.city}
+      </address>
+      <p class="actions">
+        <a class="btn btn--primary" href={restaurant.mapsHref} target="_blank" rel="noopener noreferrer">
+          {c.map}<span class="sr-only"> {c.newTab}</span>
+        </a>
+        <a class="btn btn--ghost" href={restaurant.directionsHref} target="_blank" rel="noopener noreferrer">
+          {c.directions}<span class="sr-only"> {c.newTab}</span>
+        </a>
+      </p>
+      <p><Todo>{c.mapTodo}</Todo></p>
+    </div>
+
+    <div class="facts visit__facts">
+      <div>
+        <h3>{c.hours}</h3>
+        <dl class="hours">
+          <div>
+            <dt>{c.closedLabel}</dt>
+            <dd>{c.closed}</dd>
+          </div>
+          <div>
+            <dt>{c.otherDaysLabel}</dt>
+            <dd><Todo>{c.hoursTodo}</Todo></dd>
+          </div>
+        </dl>
+      </div>
+      <div>
+        <h3>{c.contacts}</h3>
+        <ul class="tick-list">
+          <li><a href={restaurant.phoneHref}>{restaurant.phone}</a></li>
+          <li><a href={`mailto:${restaurant.email}`}>{restaurant.email}</a></li>
+          <li>
+            <a href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer">
+              {c.whatsapp}<span class="sr-only"> {c.newTab}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3>{c.services}</h3>
+        <ul class="tick-list">
+          {c.list.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit-alt {
+    margin-top: var(--space-6);
+  }
+  .visit-book-actions {
+    margin-top: var(--space-3);
+  }
+  .visit {
+    display: grid;
+    gap: var(--space-7);
+  }
+  /* Scheda indirizzo: sostituirà la mappa incorporata quando ci saranno le coordinate. */
+  .visit__map {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    padding: var(--space-6);
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-md);
+  }
+  .visit__map address {
+    font-style: normal;
+    font-size: var(--step-1);
+    line-height: var(--lh-snug);
+  }
+  .hours {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+  .hours > div {
+    display: grid;
+    gap: var(--space-1);
+    padding-bottom: var(--space-3);
+    border-bottom: var(--rule-w) solid var(--rule);
+  }
+  .hours dt {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .hours dd {
+    margin: 0;
+  }
+
+  @media (min-width: 60rem) {
+    .visit {
+      grid-template-columns: 5fr 7fr;
+      align-items: start;
+    }
+  }
+</style>

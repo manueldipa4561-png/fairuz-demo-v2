@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { pathFor, t } from '../i18n';
+
+const lang = 'it';
+const copy = t(lang);
+---
+
+<BaseLayout
+  lang={lang}
+  pageKey="home"
+  title="Pagina non trovata — Fairuz Parma"
+  description="La pagina che cerchi non esiste. Torna alla home, al menu o prenota un tavolo da Fairuz."
+>
+  <PageHero eyebrow="Errore 404" title="Questa pagina non c’è" intro="Forse il link è cambiato. Da qui puoi ripartire.">
+    <div class="actions" style="margin-top: var(--space-6)">
+      <a class="btn btn--primary" href={pathFor('home', lang)}>Torna alla home</a>
+      <a class="btn btn--ghost" href={pathFor('menu', lang)}>{copy.cta.menu}</a>
+      <a class="btn btn--ghost" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.book}</a>
+    </div>
+  </PageHero>
+</BaseLayout>

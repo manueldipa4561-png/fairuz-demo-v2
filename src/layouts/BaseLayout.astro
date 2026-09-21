@@ -1,0 +1,99 @@
+---
+import '@fontsource-variable/playfair-display/wght.css';
+import '@fontsource-variable/playfair-display/wght-italic.css';
+import '@fontsource-variable/karla/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '../styles/global.css';
+import playfairLatin from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2?url';
+import karlaLatin from '@fontsource-variable/karla/files/karla-latin-wght-normal.woff2?url';
+
+import DemoStrip from '../components/DemoStrip.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { enabledLocales, isMultilingual, otherLang, pathFor, t, type Lang, type PageKey } from '../i18n';
+import { restaurantSchema } from '../lib/schema';
+
+interface Props {
+  lang: Lang;
+  pageKey: PageKey;
+  /** Immagine Open Graph (percorso in /public). TODO: sostituire con una foto reale di Fairuz. */
+  ogImage?: string;
+  /** Sostituiscono titolo e descrizione della pagina (es. 404). */
+  title?: string;
+  description?: string;
+}
+
+const { lang, pageKey, ogImage = '/og-default.png', title, description } = Astro.props;
+const copy = t(lang);
+const meta = {
+  title: title ?? copy.meta[pageKey].title,
+  description: description ?? copy.meta[pageKey].description,
+};
+
+const site = Astro.site ?? new URL(Astro.url.origin);
+const abs = (path: string) => new URL(path, site).toString();
+const canonical = abs(pathFor(pageKey, lang));
+
+// La demo NON va indicizzata finché il cliente non approva. Per abilitare: PUBLIC_ALLOW_INDEXING=true (Netlify env).
+const allowIndexing = import.meta.env.PUBLIC_ALLOW_INDEXING === 'true';
+
+// Schema Restaurant su home e Visita & Prenota (dove Google si aspetta i dati dell'attività).
+const withSchema = pageKey === 'home' || pageKey === 'visit';
+const schema = withSchema ? restaurantSchema(lang, site, ogImage) : null;
+---
+
+<!doctype html>
+<html lang={copy.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{meta.title}</title>
+    <meta name="description" content={meta.description} />
+    <!-- I due font sopra la piega (titoli e testo): scoperti subito invece che dopo il parsing del CSS. -->
+    <link rel="preload" href={playfairLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={karlaLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={allowIndexing ? 'index, follow' : 'noindex, nofollow'} />
+
+    {
+      isMultilingual && (
+        <>
+          {enabledLocales.map((l) => <link rel="alternate" hreflang={l} href={abs(pathFor(pageKey, l))} />)}
+          <link rel="alternate" hreflang="x-default" href={abs(pathFor(pageKey, 'it'))} />
+        </>
+      )
+    }
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Fairuz Parma" />
+    <meta property="og:title" content={meta.title} />
+    <meta property="og:description" content={meta.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={copy.ogLocale} />
+    {isMultilingual && <meta property="og:locale:alternate" content={t(otherLang(lang)).ogLocale} />}
+    <meta property="og:image" content={abs(ogImage)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Fairuz Parma — ristorante libanese" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#f4ecdd" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#171310" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+
+    {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{copy.skip}</a>
+    <DemoStrip lang={lang} />
+    <Header lang={lang} pageKey={pageKey} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

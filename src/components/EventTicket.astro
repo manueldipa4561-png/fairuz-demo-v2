@@ -1,0 +1,134 @@
+---
+/**
+ * Biglietto evento: tagliando con la data + corpo. Senza `event` mostra l'impaginazione con segnaposto
+ * (il calendario reale manca: vedi src/data/events.ts).
+ */
+import type { EventItem } from '../data/events';
+
+interface Props {
+  event?: EventItem;
+}
+const { event } = Astro.props;
+
+const when = event ? new Date(`${event.date}T00:00:00Z`) : null;
+const fmt = (opts: Intl.DateTimeFormatOptions) =>
+  when ? new Intl.DateTimeFormat('it-IT', { timeZone: 'UTC', ...opts }).format(when) : '';
+---
+
+<article class:list={['ticket', { 'ticket--empty': !event }]}>
+  <div class="ticket__stub" aria-hidden={event ? undefined : 'true'}>
+    {
+      event ? (
+        <>
+          <span class="label">{fmt({ weekday: 'short' })}</span>
+          <span class="ticket__day">{fmt({ day: 'numeric' })}</span>
+          <span class="label">{fmt({ month: 'short' })}</span>
+        </>
+      ) : (
+        <>
+          <span class="label">gg</span>
+          <span class="ticket__day">––</span>
+          <span class="label">mese</span>
+        </>
+      )
+    }
+  </div>
+  <div class="ticket__body">
+    {
+      event ? (
+        <>
+          <h3>{event.title}</h3>
+          {event.description && <p>{event.description}</p>}
+          <ul class="ticket__meta label" role="list">
+            {event.time && <li>{event.time}</li>}
+            {event.price && <li>{event.price}</li>}
+          </ul>
+        </>
+      ) : (
+        <>
+          <div class="ticket__lines" aria-hidden="true">
+            <span class="bar bar--title"></span>
+            <span class="bar"></span>
+            <span class="bar bar--short"></span>
+          </div>
+          <slot />
+        </>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .ticket {
+    display: grid;
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  .ticket--empty {
+    border-style: dashed;
+  }
+  .ticket__stub {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    /* Testo scuro fisso su turchese pieno (regola 5): identico in entrambi i temi. */
+    background: var(--turquoise);
+    color: var(--night);
+    border-bottom: 2px dashed var(--night);
+  }
+  .ticket__day {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--step-4);
+    line-height: 1;
+  }
+  .ticket__body {
+    display: grid;
+    gap: var(--space-3);
+    align-content: center;
+    padding: var(--space-5);
+  }
+  .ticket__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin: 0;
+    padding: 0;
+    color: var(--link);
+  }
+  .ticket__lines {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .bar {
+    display: block;
+    height: 0.75rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+  .bar--title {
+    width: 50%;
+    height: 1.25rem;
+  }
+  .bar--short {
+    width: 65%;
+  }
+
+  @media (min-width: 40rem) {
+    .ticket {
+      grid-template-columns: 9rem 1fr;
+    }
+    .ticket__stub {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-1);
+      border-bottom: 0;
+      border-right: 2px dashed var(--night);
+    }
+  }
+</style>

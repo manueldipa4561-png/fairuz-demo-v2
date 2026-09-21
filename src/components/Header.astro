@@ -1,0 +1,281 @@
+---
+import { isMultilingual, navKeys, otherLang, pathFor, t, type Lang, type PageKey } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  pageKey: PageKey;
+}
+const { lang, pageKey } = Astro.props;
+const copy = t(lang);
+const alt = otherLang(lang);
+const links = navKeys.map((key) => ({
+  key,
+  href: pathFor(key, lang),
+  label: copy.nav[key],
+  current: key === pageKey,
+}));
+---
+
+<header class="site-header" data-site-header>
+  <div class="container site-header__bar">
+    <a class="wordmark" href={pathFor('home', lang)} aria-label={`Fairuz — ${copy.nav.home}`}>
+      Fairuz
+    </a>
+
+    <nav class="site-nav" aria-label={copy.navLabel}>
+      <ul role="list">
+        {
+          links.map((l) => (
+            <li>
+              <a class="site-nav__link label" href={l.href} aria-current={l.current ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      {
+        isMultilingual && (
+          <a
+            class="lang label"
+            href={pathFor(pageKey, alt)}
+            hreflang={alt}
+            lang={alt}
+            aria-label={copy.langSwitch.aria}>
+            {copy.langSwitch.label}
+          </a>
+        )
+      }
+      <a class="btn btn--primary btn--sm" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.bookShort}</a>
+      <button
+        type="button"
+        class="menu-toggle label"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        data-menu-toggle
+        data-label-open={copy.menuOpenLabel}
+        data-label-close={copy.menuCloseLabel}
+        data-text-close={copy.menuClose}
+        aria-label={copy.menuOpenLabel}
+      >
+        <span data-menu-toggle-text>{copy.menuOpen}</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="mobile-menu" data-mobile-menu hidden>
+    <nav class="container" aria-label={copy.navLabel}>
+      <ul role="list">
+        {
+          links.map((l) => (
+            <li>
+              <a class="mobile-menu__link" href={l.href} aria-current={l.current ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="btn btn--primary mobile-menu__cta" href={`${pathFor('visit', lang)}#prenota`}>{copy.cta.book}</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Menu mobile accessibile: aria-expanded, Esc per chiudere, focus trap, blocco scroll, ritorno del focus.
+  const header = document.querySelector<HTMLElement>('[data-site-header]');
+  const toggle = header?.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = header?.querySelector<HTMLElement>('[data-mobile-menu]');
+  const toggleText = header?.querySelector<HTMLElement>('[data-menu-toggle-text]');
+
+  if (header && toggle && menu && toggleText) {
+    const desktop = window.matchMedia('(min-width: 60rem)');
+    const closedText = toggleText.textContent ?? '';
+    // Ordine DOM: il toggle precede i link del menu, quindi il "ciclo" del trap è [toggle, ...link].
+    const focusables = () => [toggle, ...menu.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')];
+
+    const setOpen = (open: boolean, returnFocus = true) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? '');
+      toggleText.textContent = open ? (toggle.dataset.textClose ?? closedText) : closedText;
+      menu.hidden = !open;
+      document.documentElement.toggleAttribute('data-menu-open', open);
+      if (open) menu.querySelector<HTMLElement>('a')?.focus();
+      else if (returnFocus) toggle.focus();
+    };
+    const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(false, false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen()) return;
+      if (e.key === 'Escape') return setOpen(false);
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+    desktop.addEventListener('change', (e) => {
+      if (e.matches && isOpen()) setOpen(false, false);
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: var(--rule-w) solid var(--rule);
+    view-transition-name: site-header;
+  }
+  .site-header__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: var(--header-h);
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--step-1);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    min-height: var(--touch-min);
+    display: inline-flex;
+    align-items: center;
+  }
+  .wordmark:hover {
+    text-decoration: none;
+    color: var(--link);
+  }
+  .site-nav {
+    display: none;
+  }
+  .site-nav ul {
+    display: flex;
+    gap: var(--space-5);
+    margin: 0;
+  }
+  .site-nav__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-min);
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+  }
+  .site-nav__link:hover {
+    text-decoration: none;
+    border-bottom-color: var(--turquoise);
+  }
+  .site-nav__link[aria-current='page'] {
+    border-bottom-color: var(--brace);
+  }
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    color: var(--ink);
+    text-decoration: none;
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-pill);
+    padding-inline: var(--space-3);
+  }
+  .lang:hover {
+    background: var(--ink);
+    color: var(--paper);
+    text-decoration: none;
+  }
+  .btn--sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--step--2);
+  }
+  .menu-toggle {
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
+    padding-inline: var(--space-3);
+    background: transparent;
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-pill);
+    color: var(--ink);
+  }
+
+  /* Ancorato sotto la barra sticky (che contiene il menu): allineato sempre, con o senza strip demo. */
+  .mobile-menu {
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    height: calc(100dvh - var(--header-h));
+    z-index: var(--z-menu);
+    overflow-y: auto;
+    background: var(--paper);
+    border-top: var(--rule-w) solid var(--rule);
+    padding-block: var(--space-6) var(--space-9);
+  }
+  .mobile-menu[hidden] {
+    display: none;
+  }
+  .mobile-menu ul {
+    margin: 0 0 var(--space-6);
+  }
+  .mobile-menu li + li {
+    border-top: var(--rule-w) solid var(--rule);
+  }
+  .mobile-menu__link {
+    display: flex;
+    align-items: center;
+    min-height: 4rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--step-3);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .mobile-menu__link[aria-current='page'] {
+    color: var(--brace);
+  }
+  .mobile-menu__cta {
+    width: 100%;
+  }
+
+  @media (min-width: 60rem) {
+    .site-nav {
+      display: block;
+    }
+    .menu-toggle {
+      display: none;
+    }
+  }
+</style>
+
+<style is:global>
+  html[data-menu-open] {
+    overflow: hidden;
+  }
+</style>

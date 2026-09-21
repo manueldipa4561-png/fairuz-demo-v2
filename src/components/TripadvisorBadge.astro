@@ -1,0 +1,48 @@
+---
+import { t, type Lang } from '../i18n';
+import { restaurant } from '../data/restaurant';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { tripadvisor } = t(lang);
+---
+
+<aside class="review-badge" aria-label={`${tripadvisor.rating} ${tripadvisor.text}`}>
+  <p class="review-badge__score" aria-hidden="true">{tripadvisor.rating}</p>
+  <div class="review-badge__body">
+    <p class="review-badge__text">{tripadvisor.text}</p>
+    <a class="label" href={restaurant.tripadvisor.url} target="_blank" rel="noopener noreferrer">
+      {tripadvisor.cta}<span class="sr-only"> {tripadvisor.newTab}</span>
+    </a>
+  </div>
+</aside>
+
+<style>
+  .review-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-md);
+  }
+  .review-badge__score {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--step-3);
+    line-height: 1;
+    color: var(--brace);
+  }
+  .review-badge__text {
+    font-size: var(--step--1);
+    margin-bottom: var(--space-1);
+  }
+  .review-badge a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--touch-min);
+  }
+</style>

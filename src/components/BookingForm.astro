@@ -1,0 +1,462 @@
+---
+/**
+ * Modulo di prenotazione DIMOSTRATIVO (regola 7: nessun backend).
+ * Valida nel browser, mostra un riepilogo e offre WhatsApp come via secondaria: i dati non vengono inviati
+ * né salvati. Nessuna fascia oraria inventata (gli orari reali mancano): l'ora è libera e si segnala il TODO.
+ * Rifiuta le date del giorno di chiusura verificato (martedì).
+ * Progressive enhancement: senza JS il modulo è nascosto (html:not(.js)) e resta l'alternativa WhatsApp/telefono.
+ */
+import { restaurant } from '../data/restaurant';
+import Todo from './Todo.astro';
+
+const c = {
+  demo: 'Demo',
+  demoText: 'Nessuna prenotazione viene inviata: i dati restano su questo schermo.',
+  date: 'Data',
+  time: 'Ora',
+  people: 'Persone',
+  name: 'Nome',
+  phone: 'Telefono',
+  notes: 'Note',
+  optional: 'facoltative',
+  timeTodo: 'fasce orarie di servizio da confermare',
+  submit: 'Richiedi il tavolo',
+  less: 'Una persona in meno',
+  more: 'Una persona in più',
+  noJs: 'Per prenotare scrivici su WhatsApp o chiamaci: il modulo richiede JavaScript.',
+  resultTitle: 'Richiesta pronta',
+  resultLead: 'Questa è una demo: la richiesta non è stata inviata a nessuno.',
+  resultDate: 'Data',
+  resultTime: 'Ora',
+  resultPeople: 'Persone',
+  resultName: 'Nome',
+  resultTodo: 'invio reale e conferma della prenotazione: da collegare al sistema del cliente',
+  whatsapp: 'Continua su WhatsApp',
+  edit: 'Modifica',
+  newTab: '(si apre in una nuova scheda)',
+};
+---
+
+<div
+  class="booking"
+  data-booking
+  data-closed-day={restaurant.closedWeekday}
+  data-closed-label={restaurant.closedDay}
+  data-wa={restaurant.whatsappHref}
+>
+  <p class="booking__demo">
+    <span class="label booking__badge">{c.demo}</span>
+    {c.demoText}
+  </p>
+
+  <noscript><p>{c.noJs}</p></noscript>
+
+  <form class="booking__form" novalidate data-booking-form aria-label="Prenota un tavolo">
+    <div class="booking__row booking__row--3">
+      <div class="field">
+        <label for="b-date">{c.date}</label>
+        <input id="b-date" name="date" type="date" required aria-describedby="b-date-err" />
+        <p class="field__error" id="b-date-err"></p>
+      </div>
+      <div class="field">
+        <label for="b-time">{c.time}</label>
+        <input id="b-time" name="time" type="time" required aria-describedby="b-time-hint b-time-err" />
+        <p class="field__hint" id="b-time-hint"><Todo>{c.timeTodo}</Todo></p>
+        <p class="field__error" id="b-time-err"></p>
+      </div>
+      <div class="field">
+        <label for="b-people">{c.people}</label>
+        <div class="stepper">
+          <button type="button" class="stepper__btn" data-step="-1" aria-label={c.less}>−</button>
+          <input
+            id="b-people"
+            name="people"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            step="1"
+            value="2"
+            required
+            aria-describedby="b-people-err"
+          />
+          <button type="button" class="stepper__btn" data-step="1" aria-label={c.more}>+</button>
+        </div>
+        <p class="field__error" id="b-people-err"></p>
+      </div>
+    </div>
+
+    <div class="booking__row booking__row--2">
+      <div class="field">
+        <label for="b-name">{c.name}</label>
+        <input id="b-name" name="name" type="text" autocomplete="name" required aria-describedby="b-name-err" />
+        <p class="field__error" id="b-name-err"></p>
+      </div>
+      <div class="field">
+        <label for="b-phone">{c.phone}</label>
+        <input
+          id="b-phone"
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          required
+          aria-describedby="b-phone-err"
+        />
+        <p class="field__error" id="b-phone-err"></p>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="b-notes">{c.notes} <span class="field__opt">({c.optional})</span></label>
+      <textarea id="b-notes" name="notes" rows="3" maxlength="300"></textarea>
+    </div>
+
+    <button class="btn btn--primary booking__submit" type="submit">{c.submit}</button>
+  </form>
+
+  <div class="booking__result" data-booking-result hidden>
+    <svg class="tick" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
+      <circle class="tick__ring" cx="26" cy="26" r="23" pathLength="1"></circle>
+      <path class="tick__mark" d="M15 27 l8 8 l15 -17" pathLength="1"></path>
+    </svg>
+    <h3 tabindex="-1" data-result-title>{c.resultTitle}</h3>
+    <p>{c.resultLead}</p>
+    <dl class="summary">
+      <div><dt>{c.resultDate}</dt><dd data-out="date"></dd></div>
+      <div><dt>{c.resultTime}</dt><dd data-out="time"></dd></div>
+      <div><dt>{c.resultPeople}</dt><dd data-out="people"></dd></div>
+      <div><dt>{c.resultName}</dt><dd data-out="name"></dd></div>
+    </dl>
+    <p><Todo>{c.resultTodo}</Todo></p>
+    <div class="actions">
+      <a class="btn btn--primary" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer" data-wa-link>
+        {c.whatsapp}<span class="sr-only"> {c.newTab}</span>
+      </a>
+      <button class="btn btn--ghost" type="button" data-edit>{c.edit}</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-booking]');
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('[data-booking-form]')!;
+    const result = root.querySelector<HTMLElement>('[data-booking-result]')!;
+    const resultTitle = result.querySelector<HTMLElement>('[data-result-title]')!;
+    const waLink = result.querySelector<HTMLAnchorElement>('[data-wa-link]')!;
+    const closedDay = Number(root.dataset.closedDay);
+    const closedLabel = root.dataset.closedLabel ?? '';
+    const waBase = root.dataset.wa ?? '';
+
+    const fields = {
+      date: form.elements.namedItem('date') as HTMLInputElement,
+      time: form.elements.namedItem('time') as HTMLInputElement,
+      people: form.elements.namedItem('people') as HTMLInputElement,
+      name: form.elements.namedItem('name') as HTMLInputElement,
+      phone: form.elements.namedItem('phone') as HTMLInputElement,
+    };
+    type Key = keyof typeof fields;
+    const order: Key[] = ['date', 'time', 'people', 'name', 'phone'];
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const today = new Date();
+    const todayIso = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+    fields.date.min = todayIso;
+    // Mezzogiorno locale: evita che il fuso orario sposti il giorno della settimana.
+    const toDate = (iso: string) => new Date(`${iso}T12:00:00`);
+
+    const errors: Record<Key, (v: string) => string> = {
+      date(v) {
+        if (!v) return 'Scegli una data.';
+        if (v < todayIso) return 'Scegli una data da oggi in poi.';
+        if (toDate(v).getDay() === closedDay) return `Il ${closedLabel} siamo chiusi: scegli un altro giorno.`;
+        return '';
+      },
+      time: (v) => (v ? '' : 'Indica un orario.'),
+      people(v) {
+        const n = Number(v);
+        return Number.isInteger(n) && n >= 1 ? '' : 'Indica quante persone (almeno 1).';
+      },
+      name: (v) => (v.trim().length >= 2 ? '' : 'Scrivi il tuo nome.'),
+      phone: (v) => (v.replace(/\D/g, '').length >= 6 ? '' : 'Scrivi un numero di telefono valido.'),
+    };
+
+    const show = (key: Key, message: string) => {
+      const input = fields[key];
+      const out = document.getElementById(`${input.id}-err`);
+      if (out) out.textContent = message;
+      if (message) input.setAttribute('aria-invalid', 'true');
+      else input.removeAttribute('aria-invalid');
+    };
+    const validate = (key: Key) => {
+      const message = errors[key](fields[key].value);
+      show(key, message);
+      return !message;
+    };
+
+    let attempted = false;
+    for (const key of order) {
+      const input = fields[key];
+      // Dopo il primo tentativo l'errore si aggiorna mentre si scrive, così sparisce appena è corretto.
+      input.addEventListener('input', () => attempted && validate(key));
+      input.addEventListener('change', () => attempted && validate(key));
+    }
+
+    // Stepper persone: + e − rispettano il minimo e ripetono l'evento "input" per la validazione.
+    root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const next = Math.max(1, (Number(fields.people.value) || 1) + Number(btn.dataset.step));
+        fields.people.value = String(next);
+        fields.people.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      attempted = true;
+      const invalid = order.filter((key) => !validate(key));
+      if (invalid.length) {
+        fields[invalid[0]].focus();
+        return;
+      }
+
+      const longDate = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }).format(
+        toDate(fields.date.value),
+      );
+      const date = longDate.charAt(0).toUpperCase() + longDate.slice(1);
+      const people = Number(fields.people.value);
+      const peopleText = `${people} ${people === 1 ? 'persona' : 'persone'}`;
+      const name = fields.name.value.trim();
+      const set = (key: string, text: string) => {
+        result.querySelector<HTMLElement>(`[data-out="${key}"]`)!.textContent = text;
+      };
+      set('date', date);
+      set('time', fields.time.value);
+      set('people', peopleText);
+      set('name', name);
+
+      // Il testo pre-compilato contiene solo ciò che serve: il telefono non viaggia nell'URL.
+      const text = `Ciao Fairuz, vorrei prenotare un tavolo per ${peopleText}, ${longDate} alle ${fields.time.value}. Nome: ${name}.`;
+      waLink.href = `${waBase}?text=${encodeURIComponent(text)}`;
+
+      form.hidden = true;
+      result.hidden = false;
+      resultTitle.focus();
+    });
+
+    result.querySelector<HTMLButtonElement>('[data-edit]')!.addEventListener('click', () => {
+      result.hidden = true;
+      form.hidden = false;
+      fields.date.focus();
+    });
+
+  }
+</script>
+
+<style>
+  .booking {
+    display: grid;
+    gap: var(--space-5);
+    max-width: 46rem;
+    padding: var(--space-6);
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-md);
+  }
+  .booking__demo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    max-width: none;
+    color: var(--ink-soft);
+    font-size: var(--step--1);
+  }
+  .booking__badge {
+    padding: 0 var(--space-3);
+    /* Testo scuro fisso su turchese pieno (regola 5). */
+    background: var(--turquoise);
+    color: var(--night);
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+  }
+  .booking__form {
+    display: grid;
+    gap: var(--space-5);
+  }
+  /* Senza JS il modulo non può funzionare: resta l'alternativa WhatsApp/telefono (classe `js` impostata in <head>). */
+  :global(html:not(.js)) .booking__form,
+  .booking__form[hidden],
+  .booking__result[hidden] {
+    display: none;
+  }
+  .booking__row {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .field {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+  .field label {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--link);
+  }
+  .field__opt {
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-soft);
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    min-height: var(--touch-min);
+    padding: var(--space-2) var(--space-3);
+    background: var(--paper);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .field textarea {
+    resize: vertical;
+  }
+  .field input:hover,
+  .field textarea:hover {
+    border-color: var(--link);
+  }
+  .field input[aria-invalid='true'] {
+    border-color: var(--brace);
+    box-shadow: 0 0 0 1px var(--brace);
+  }
+  .field__hint {
+    font-size: var(--step--1);
+    max-width: none;
+  }
+  .field__error {
+    margin: 0;
+    max-width: none;
+    color: var(--brace);
+    font-size: var(--step--1);
+  }
+  .field__error:empty {
+    display: contents;
+  }
+
+  /* Stepper: pulsanti da 44px con l'input al centro, senza le frecce native. */
+  .stepper {
+    display: grid;
+    grid-template-columns: var(--touch-min) 1fr var(--touch-min);
+  }
+  .stepper input {
+    border-radius: 0;
+    border-inline: 0;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .stepper input::-webkit-outer-spin-button,
+  .stepper input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .stepper__btn {
+    min-height: var(--touch-min);
+    background: var(--paper);
+    color: var(--ink);
+    border: var(--rule-w) solid var(--rule-strong);
+    font-size: var(--step-1);
+    line-height: 1;
+    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .stepper__btn:first-child {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  }
+  .stepper__btn:last-child {
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .stepper__btn:hover {
+    /* Testo scuro fisso su turchese pieno (regola 5). */
+    background: var(--turquoise);
+    color: var(--night);
+  }
+  .stepper__btn:active {
+    transform: scale(0.94);
+  }
+
+  .booking__submit {
+    justify-self: start;
+  }
+
+  /* Riepilogo */
+  .booking__result {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+  .booking__result h3:focus-visible {
+    outline-offset: 6px;
+  }
+  .tick {
+    width: 3.5rem;
+    height: 3.5rem;
+    fill: none;
+    stroke: var(--link);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tick__ring,
+  .tick__mark {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: tick-draw 700ms var(--ease-out) both;
+  }
+  .tick__mark {
+    animation-delay: 350ms;
+  }
+  @keyframes tick-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+  .summary {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+    margin: 0;
+  }
+  .summary > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: var(--rule-w) solid var(--rule);
+  }
+  .summary dt {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .summary dd {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  @media (min-width: 40rem) {
+    .booking__row--3 {
+      grid-template-columns: 1.2fr 1fr 1fr;
+    }
+    .booking__row--2 {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

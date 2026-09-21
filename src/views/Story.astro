@@ -1,0 +1,133 @@
+---
+import CtaBand from '../components/CtaBand.astro';
+import PageHero from '../components/PageHero.astro';
+import PhotoFrame from '../components/PhotoFrame.astro';
+import Todo from '../components/Todo.astro';
+import RhombusDivider from '../components/home/RhombusDivider.astro';
+import { pathFor, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+// Solo italiano (regola 8): l'inglese si riattiva riscrivendo questo blocco per lingua.
+// Nessun fatto sul locale: la storia reale, le persone e l'origine del nome (regola 3) arrivano dal cliente.
+const c = {
+  eyebrow: 'Storia',
+  title: 'La nostra storia',
+  intro: 'Il Libano a Parma, raccontato a tavola.',
+  chapters: [
+    {
+      id: 'origini',
+      kicker: 'Le origini',
+      todo: 'storia reale di Fairuz: famiglia, origini del locale e dei piatti (testi da ricevere dal cliente)',
+      photo: 'foto reale: il locale',
+    },
+    {
+      id: 'cucina',
+      kicker: 'La cucina',
+      todo: 'la cucina raccontata dal cliente: ricette, ingredienti, modo di lavorare (testi da ricevere)',
+      photo: 'foto reale: la cucina e i piatti',
+    },
+    {
+      id: 'persone',
+      kicker: 'Le persone',
+      todo: 'le persone di Fairuz: chi c’è in cucina e in sala (testi e consenso a pubblicare i nomi da ricevere)',
+      photo: 'foto reale: il team',
+    },
+  ],
+  nameTitle: 'Il nome',
+  nameTodo: 'origine del nome “Fairuz”: da chiedere al cliente, non dedurla',
+  menuCta: 'Scopri il menu',
+  bandTitle: 'La storia continua a tavola.',
+};
+---
+
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+
+{
+  c.chapters.map((ch, i) => (
+    <section class:list={['story', { 'story--flip': i % 2 === 1 }]} id={ch.id} aria-labelledby={`${ch.id}-title`}>
+      <div class="container story__grid">
+        <div class="story__text">
+          <p class="label label--link story__index">
+            <span>{String(i + 1).padStart(2, '0')}</span>
+            <span>{ch.kicker}</span>
+          </p>
+          <h2 id={`${ch.id}-title`}>{ch.kicker}</h2>
+          <p class="story__body">
+            <Todo>{ch.todo}</Todo>
+          </p>
+        </div>
+        <div class="story__photo">
+          <PhotoFrame todo={ch.photo} />
+        </div>
+      </div>
+    </section>
+  ))
+}
+
+<RhombusDivider />
+
+<section class="section" aria-labelledby="name">
+  <div class="container stack">
+    <h2 id="name">{c.nameTitle}</h2>
+    <p><Todo>{c.nameTodo}</Todo></p>
+    <p class="actions">
+      <a class="btn btn--ghost" href={pathFor('menu', lang)}>{c.menuCta}</a>
+    </p>
+  </div>
+</section>
+
+<CtaBand lang={lang} title={c.bandTitle} />
+
+<style>
+  .story {
+    padding-block: var(--space-8);
+    border-bottom: var(--rule-w) solid var(--rule);
+  }
+  .story__grid {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+  .story__text {
+    display: grid;
+    gap: var(--space-4);
+    align-content: center;
+  }
+  .story__index {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .story__index span:first-child {
+    padding: 0.1em 0.6em;
+    border: var(--rule-w) solid currentColor;
+    border-radius: var(--radius-pill);
+  }
+  .story__photo {
+    --photo-ratio: 4 / 3;
+    width: 100%;
+    max-width: 26rem;
+    justify-self: center;
+  }
+
+  @media (min-width: 60rem) {
+    .story__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-8);
+    }
+    .story--flip .story__text {
+      order: 2;
+    }
+    .story__photo {
+      --photo-ratio: 4 / 5;
+      justify-self: start;
+    }
+    .story--flip .story__photo {
+      justify-self: end;
+    }
+  }
+</style>
