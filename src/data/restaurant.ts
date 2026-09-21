@@ -35,6 +35,8 @@ export const restaurant = {
   },
   /** Verificato: la bio Instagram ufficiale dice "Giorno di chiusura: martedì". */
   closedDay: 'martedì',
+  /** Indice JS del giorno di chiusura (0 = domenica): martedì = 2. Serve a rifiutare date di martedì nel modulo. */
+  closedWeekday: 2,
   /** TODO: fasce orarie reali di pranzo/cena (il sito attuale mostra solo "Siamo chiusi / Cucina aperta"). */
   hours: null as null | string,
   /** TODO: coordinate per lo schema e la mappa incorporata. */

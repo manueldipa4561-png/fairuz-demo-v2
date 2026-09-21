@@ -1,5 +1,7 @@
 ---
+import BookingForm from '../components/BookingForm.astro';
 import PageHero from '../components/PageHero.astro';
+import ReviewsProof from '../components/ReviewsProof.astro';
 import Todo from '../components/Todo.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
 import { restaurant } from '../data/restaurant';
@@ -18,8 +20,7 @@ const c = {
   title: 'Visita & Prenota',
   intro: 'Vieni a trovarci in Via Luigi Vigotti, a Parma.',
   bookTitle: 'Prenota un tavolo',
-  bookTodo:
-    'Fase 4 — modulo Standard Booking (data, ora, persone), dimostrativo e senza backend, con WhatsApp come via secondaria',
+  altTitle: 'Preferisci scrivere o chiamare?',
   where: 'Dove siamo',
   map: 'Apri la mappa',
   directions: 'Indicazioni stradali',
@@ -52,7 +53,8 @@ const c = {
     <div class="section-head">
       <h2 id="prenota-title">{c.bookTitle}</h2>
     </div>
-    <p><Todo>{c.bookTodo}</Todo></p>
+    <BookingForm />
+    <p class="label label--link visit-alt">{c.altTitle}</p>
     <p class="actions visit-book-actions">
       <a class="btn btn--ghost" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer">
         {c.whatsapp}<span class="sr-only"> {c.newTab}</span>
@@ -61,6 +63,8 @@ const c = {
     </p>
   </div>
 </section>
+
+<ReviewsProof lang={lang} />
 
 <RhombusDivider />
 
@@ -121,8 +125,11 @@ const c = {
 </section>
 
 <style>
+  .visit-alt {
+    margin-top: var(--space-6);
+  }
   .visit-book-actions {
-    margin-top: var(--space-4);
+    margin-top: var(--space-3);
   }
   .visit {
     display: grid;
