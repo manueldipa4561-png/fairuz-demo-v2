@@ -1,20 +1,44 @@
 ---
 /**
- * Cornice per una foto reale che manca ancora (regola 9: solo foto di Fairuz, con OK dell'utente).
- * Proporzioni da `--photo-ratio` (ereditata: chi la usa la imposta sul contenitore), così l'impaginato
- * non cambia quando arriva la foto. Colori da `currentColor`: funziona su carta, notte e brace.
+ * Cornice per una foto reale di Fairuz (regola 9: solo immagini di Fairuz, con OK dell'utente).
+ *
+ * Basta mettere il file in `public/photos/<nome>.(png|jpg|jpeg|webp)` e ricostruire: la cornice lo trova
+ * da sola (build-time) e mostra la foto. Se il file non c'è, resta il segnaposto `<Todo>`.
+ * Le proporzioni vengono da `--photo-ratio` (impostata da chi usa il componente).
  */
+import fs from 'node:fs';
+import path from 'node:path';
 import Todo from './Todo.astro';
 
 interface Props {
+  /** Testo del segnaposto quando la foto non c'è ancora. */
   todo: string;
+  /** Nome del file in /public/photos senza estensione (es. "barbecue"). */
+  name?: string;
+  /** Testo alternativo descrittivo per chi non vede la foto. */
+  alt?: string;
 }
-const { todo, ...rest } = Astro.props;
+const { todo, name, alt = '' } = Astro.props;
+
+const exts = ['png', 'jpg', 'jpeg', 'webp'];
+const photosDir = path.join(process.cwd(), 'public', 'photos');
+const file = name ? exts.map((e) => `${name}.${e}`).find((f) => fs.existsSync(path.join(photosDir, f))) : undefined;
+const src = file ? `/photos/${file}` : undefined;
 ---
 
-<figure class="photo-frame" {...rest}>
-  <figcaption><Todo>{todo}</Todo></figcaption>
-</figure>
+{
+  src ? (
+    <figure class="photo-frame photo-frame--filled">
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+    </figure>
+  ) : (
+    <figure class="photo-frame">
+      <figcaption>
+        <Todo>{todo}</Todo>
+      </figcaption>
+    </figure>
+  )
+}
 
 <style>
   .photo-frame {
@@ -38,5 +62,21 @@ const { todo, ...rest } = Astro.props;
     inset: var(--space-2);
     border: var(--rule-w) solid color-mix(in srgb, currentColor 35%, transparent);
     pointer-events: none;
+  }
+  /* Con la foto: niente tratteggio, la foto riempie la cornice mantenendo le proporzioni. */
+  .photo-frame--filled {
+    padding: 0;
+    background: none;
+    overflow: hidden;
+  }
+  .photo-frame--filled::before {
+    inset: var(--space-2);
+    border-color: color-mix(in srgb, #fff 70%, transparent);
+    z-index: 1;
+  }
+  .photo-frame--filled img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 </style>

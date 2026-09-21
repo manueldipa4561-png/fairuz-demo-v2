@@ -1,8 +1,8 @@
 ---
-import Todo from '../components/Todo.astro';
 import TripadvisorBadge from '../components/TripadvisorBadge.astro';
 import Chapter from '../components/home/Chapter.astro';
 import ReviewsProof from '../components/ReviewsProof.astro';
+import Sample from '../components/Sample.astro';
 import Seal from '../components/home/Seal.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
 import Embers from '../components/home/art/Embers.astro';
@@ -140,7 +140,6 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
     <a class="btn btn--ghost" href={pathFor('menu', lang)}>{copy.cta.menu}</a>
     <a class="btn btn--ghost" href={pathFor('events', lang)}>{copy.cta.events}</a>
   </div>
-  <p><Todo>{c.dateTodo}</Todo></p>
   <Table slot="art" />
 </Chapter>
 
@@ -150,8 +149,8 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
   <p class="lead">{ch.prenota.lead}</p>
   <address class="visit-facts">
     {`${restaurant.address.street}, ${restaurant.address.postalCode} ${restaurant.address.city}`}<br />
-    {ch.prenota.closed}
-    <Todo>{ch.prenota.hoursTodo}</Todo>
+    {ch.prenota.closed}<br />
+    <span class="hours-line"><Sample /> Mer–Lun · 12–14:30 · 19–23</span>
   </address>
   <div class="chapter-actions">
     <a class="btn btn--night" href={bookHref}>{copy.cta.book}</a>
@@ -180,7 +179,7 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
       </a>
       <a class="card" href={pathFor('events', lang)}>
         <h3>{c.cards.events.t}</h3>
-        <p>{c.cards.events.p} <Todo>{c.dateTodo}</Todo></p>
+        <p>{c.cards.events.p}</p>
         <span class="card__cta label">{c.cards.events.cta} →</span>
       </a>
     </div>
@@ -330,6 +329,13 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
   .visit-facts {
     font-style: normal;
     line-height: var(--lh-body);
+  }
+  .hours-line {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-2);
   }
   .btn--night {
     background: var(--night);

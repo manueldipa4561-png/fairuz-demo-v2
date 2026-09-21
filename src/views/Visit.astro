@@ -4,6 +4,7 @@ import PageHero from '../components/PageHero.astro';
 import ReviewsProof from '../components/ReviewsProof.astro';
 import Todo from '../components/Todo.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
+import Sample from '../components/Sample.astro';
 import { restaurant } from '../data/restaurant';
 import { t, type Lang } from '../i18n';
 
@@ -30,8 +31,10 @@ const c = {
   hours: 'Orari',
   closedLabel: 'Martedì',
   closed: 'Chiuso',
-  otherDaysLabel: 'Altri giorni',
-  hoursTodo: 'fasce orarie di pranzo e cena da confermare',
+  lunchLabel: 'Mer – Lun · Pranzo',
+  lunchHours: '12:00 – 14:30',
+  dinnerLabel: 'Mer – Lun · Cena',
+  dinnerHours: '19:00 – 23:00',
   services: 'Servizi',
   // Servizi dichiarati sul sito attuale del ristorante (fairuz.eatbu.com).
   list: [
@@ -91,14 +94,19 @@ const c = {
     <div class="facts visit__facts">
       <div>
         <h3>{c.hours}</h3>
+        <p class="hours-note"><Sample /> orari dimostrativi, da confermare</p>
         <dl class="hours">
+          <div>
+            <dt>{c.lunchLabel}</dt>
+            <dd>{c.lunchHours}</dd>
+          </div>
+          <div>
+            <dt>{c.dinnerLabel}</dt>
+            <dd>{c.dinnerHours}</dd>
+          </div>
           <div>
             <dt>{c.closedLabel}</dt>
             <dd>{c.closed}</dd>
-          </div>
-          <div>
-            <dt>{c.otherDaysLabel}</dt>
-            <dd><Todo>{c.hoursTodo}</Todo></dd>
           </div>
         </dl>
       </div>
@@ -149,6 +157,10 @@ const c = {
     font-style: normal;
     font-size: var(--step-1);
     line-height: var(--lh-snug);
+  }
+  .hours-note {
+    margin-bottom: var(--space-3);
+    font-size: var(--step--1);
   }
   .hours {
     display: grid;

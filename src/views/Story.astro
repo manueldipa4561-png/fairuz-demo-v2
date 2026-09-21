@@ -2,7 +2,7 @@
 import CtaBand from '../components/CtaBand.astro';
 import PageHero from '../components/PageHero.astro';
 import PhotoFrame from '../components/PhotoFrame.astro';
-import Todo from '../components/Todo.astro';
+import Sample from '../components/Sample.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
 import { pathFor, type Lang } from '../i18n';
 
@@ -17,34 +17,37 @@ const c = {
   eyebrow: 'Storia',
   title: 'La nostra storia',
   intro: 'Il Libano a Parma, raccontato a tavola.',
+  sampleNote: 'Testi dimostrativi: la storia reale la racconta Fairuz.',
   chapters: [
     {
       id: 'origini',
       kicker: 'Le origini',
-      todo: 'storia reale di Fairuz: famiglia, origini del locale e dei piatti (testi da ricevere dal cliente)',
+      body: 'Fairuz nasce dal desiderio di portare a Parma la tavola libanese: quella in cui il cibo è prima di tutto un gesto di ospitalità. Ogni piatto racconta un pezzo di Mediterraneo, tra spezie, brace e pane condiviso.',
       photo: 'foto reale: il locale',
     },
     {
       id: 'cucina',
       kicker: 'La cucina',
-      todo: 'la cucina raccontata dal cliente: ricette, ingredienti, modo di lavorare (testi da ricevere)',
+      body: 'Tutto parte dalla brace e dalle mani: le mezze preparate ogni giorno, le grigliate marinate a lungo, i dolci che chiudono il pasto. Sapori tradizionali, senza scorciatoie, come si fa a casa.',
       photo: 'foto reale: la cucina e i piatti',
     },
     {
       id: 'persone',
       kicker: 'Le persone',
-      todo: 'le persone di Fairuz: chi c’è in cucina e in sala (testi e consenso a pubblicare i nomi da ricevere)',
+      body: 'Dietro ogni serata c’è chi accoglie in sala e chi lavora alla griglia. È da qui che nasce il modo di stare a tavola di Fairuz: senza fretta, come tra ospiti.',
       photo: 'foto reale: il team',
     },
   ],
   nameTitle: 'Il nome',
-  nameTodo: 'origine del nome “Fairuz”: da chiedere al cliente, non dedurla',
+  nameBody: '«Fairuz» è un nome che nel mondo arabo evoca musica, luce e ospitalità. Per noi è soprattutto un invito: sedersi, condividere, sentirsi a casa.',
   menuCta: 'Scopri il menu',
   bandTitle: 'La storia continua a tavola.',
 };
 ---
 
-<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
+  <p class="story-note"><Sample /> {c.sampleNote}</p>
+</PageHero>
 
 {
   c.chapters.map((ch, i) => (
@@ -56,9 +59,7 @@ const c = {
             <span>{ch.kicker}</span>
           </p>
           <h2 id={`${ch.id}-title`}>{ch.kicker}</h2>
-          <p class="story__body">
-            <Todo>{ch.todo}</Todo>
-          </p>
+          <p class="story__body story__body--dropcap">{ch.body}</p>
         </div>
         <div class="story__photo">
           <PhotoFrame todo={ch.photo} />
@@ -72,8 +73,8 @@ const c = {
 
 <section class="section" aria-labelledby="name">
   <div class="container stack">
-    <h2 id="name">{c.nameTitle}</h2>
-    <p><Todo>{c.nameTodo}</Todo></p>
+    <h2 id="name">{c.nameTitle} <Sample /></h2>
+    <p>{c.nameBody}</p>
     <p class="actions">
       <a class="btn btn--ghost" href={pathFor('menu', lang)}>{c.menuCta}</a>
     </p>
@@ -83,6 +84,9 @@ const c = {
 <CtaBand lang={lang} title={c.bandTitle} />
 
 <style>
+  .story-note {
+    margin-top: var(--space-5);
+  }
   .story {
     padding-block: var(--space-8);
     border-bottom: var(--rule-w) solid var(--rule);

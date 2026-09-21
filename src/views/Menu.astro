@@ -2,8 +2,9 @@
 import CtaBand from '../components/CtaBand.astro';
 import DishCard from '../components/DishCard.astro';
 import PageHero from '../components/PageHero.astro';
+import Sample from '../components/Sample.astro';
 import Todo from '../components/Todo.astro';
-import { menuCategories } from '../data/menu';
+import { menuCategories, menuIsSample } from '../data/menu';
 import { restaurant } from '../data/restaurant';
 import { t, type Lang } from '../i18n';
 
@@ -19,7 +20,9 @@ const c = {
   title: 'Il menu',
   intro: 'Cucina libanese: mezze, grigliate, falafel e dolci.',
   navLabel: 'Categorie del menu',
-  categoriesTodo: 'categorie provvisorie (mezze, grigliate, falafel, dolci): da allineare al menu reale',
+  sampleNote: 'Menu dimostrativo con piatti tipici libanesi. I piatti e i prezzi reali arrivano dal cliente.',
+  lunchTitle: 'Formula pranzo',
+  lunchText: 'Piatto del giorno con bevanda inclusa — 15 € (da confermare).',
   dishTodo: 'piatti, descrizioni e prezzi di questa categoria dal menu reale di Fairuz',
   dietTitle: 'Allergeni e diete',
   dietTodo:
@@ -32,7 +35,9 @@ const c = {
 ---
 
 <PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
-  <p class="menu-note"><Todo>{c.categoriesTodo}</Todo></p>
+  {menuIsSample && (
+    <p class="menu-note"><Sample /> {c.sampleNote}</p>
+  )}
 </PageHero>
 
 <nav class="menu-nav" aria-label={c.navLabel} data-menu-nav>
@@ -71,6 +76,15 @@ const c = {
     </section>
   ))
 }
+
+<section class="section menu-lunch" aria-labelledby="lunch">
+  <div class="container">
+    <div class="lunch-card">
+      <h2 id="lunch">{c.lunchTitle} <Sample /></h2>
+      <p>{c.lunchText}</p>
+    </div>
+  </div>
+</section>
 
 <section class="section menu-diet" aria-labelledby="diet">
   <div class="container stack">
@@ -160,5 +174,22 @@ const c = {
   }
   .menu-diet {
     padding-block: var(--space-8);
+  }
+  .menu-lunch {
+    padding-block: 0;
+  }
+  .lunch-card {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-md);
+  }
+  .lunch-card h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
   }
 </style>
