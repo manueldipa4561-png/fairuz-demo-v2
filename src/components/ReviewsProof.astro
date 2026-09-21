@@ -1,0 +1,133 @@
+---
+/**
+ * Prova sociale: SOLO il dato verificato (4,7/5 su Tripadvisor, oltre 150 recensioni) + link alle recensioni reali.
+ * Nessuna citazione, nessun aggregateRating nello schema (regola 2). Le stelle sono una resa grafica del 4,7.
+ */
+import { restaurant } from '../data/restaurant';
+import Todo from './Todo.astro';
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { tripadvisor } = t(lang);
+const { rating, url } = restaurant.tripadvisor;
+
+const score = rating.toLocaleString('it-IT', { minimumFractionDigits: 1 });
+const emptyPct = 100 - (rating / 5) * 100;
+const star = '10,1.5 12.6,7.3 19,7.9 14.2,12.1 15.6,18.4 10,15.1 4.4,18.4 5.8,12.1 1,7.9 7.4,7.3';
+
+const c = {
+  eyebrow: 'Recensioni',
+  title: 'Cosa ne pensano gli ospiti',
+  todo: 'recensioni scelte da citare: solo con il consenso degli autori, da selezionare con il cliente',
+};
+---
+
+<section class="reviews section" aria-labelledby="reviews-title">
+  <div class="container reviews__inner">
+    <div class="reviews__copy">
+      <p class="label label--link">{c.eyebrow}</p>
+      <h2 id="reviews-title">{c.title}</h2>
+      <p class="reviews__lead">{tripadvisor.text}</p>
+      <p class="actions">
+        <a class="btn btn--ghost" href={url} target="_blank" rel="noopener noreferrer">
+          {tripadvisor.cta}<span class="sr-only"> {tripadvisor.newTab}</span>
+        </a>
+      </p>
+      <p><Todo>{c.todo}</Todo></p>
+    </div>
+
+    <div class="reviews__score" role="img" aria-label={`${score} su 5`}>
+      <p class="reviews__num" aria-hidden="true">{score}<span>/5</span></p>
+      <svg class="stars" viewBox="0 0 100 20" aria-hidden="true" focusable="false" style={`--empty: ${emptyPct}%`}>
+        <g class="stars__base">
+          {[0, 1, 2, 3, 4].map((i) => <polygon points={star} transform={`translate(${i * 20} 0)`} />)}
+        </g>
+        <g class="stars__fill">
+          {[0, 1, 2, 3, 4].map((i) => <polygon points={star} transform={`translate(${i * 20} 0)`} />)}
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .reviews {
+    padding-block: var(--space-8);
+  }
+  .reviews__inner {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+  .reviews__copy {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+  .reviews__lead {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-1);
+    color: var(--ink-soft);
+  }
+  .reviews__score {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+  .reviews__num {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--step-5);
+    line-height: 0.9;
+    color: var(--brace);
+  }
+  .reviews__num span {
+    font-size: 0.4em;
+    color: var(--ink-soft);
+  }
+  .stars {
+    width: min(16rem, 100%);
+    overflow: visible;
+  }
+  .stars__base polygon {
+    fill: none;
+    stroke: var(--rule-strong);
+    stroke-width: 0.8;
+    stroke-linejoin: round;
+  }
+  .stars__fill polygon {
+    fill: var(--brace);
+  }
+  .stars__fill {
+    clip-path: inset(0 var(--empty) 0 0);
+  }
+
+  /* Micro-interazione: le stelle si riempiono quando entrano in vista (solo dove supportato). */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .stars__fill {
+        animation: stars-fill linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 90%;
+      }
+      @keyframes stars-fill {
+        from {
+          clip-path: inset(0 100% 0 0);
+        }
+      }
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .reviews__inner {
+      grid-template-columns: 3fr 2fr;
+    }
+    .reviews__score {
+      justify-items: end;
+    }
+  }
+</style>

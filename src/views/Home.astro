@@ -2,6 +2,7 @@
 import Todo from '../components/Todo.astro';
 import TripadvisorBadge from '../components/TripadvisorBadge.astro';
 import Chapter from '../components/home/Chapter.astro';
+import ReviewsProof from '../components/ReviewsProof.astro';
 import Seal from '../components/home/Seal.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
 import Embers from '../components/home/art/Embers.astro';
@@ -150,6 +151,8 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
   <p><Todo>{c.dateTodo}</Todo></p>
   <Table slot="art" />
 </Chapter>
+
+<ReviewsProof lang={lang} />
 
 <Chapter id="prenota-ora" index="05" word="Prenota" kicker={ch.prenota.kicker} tone="brace" photoTodo={ch.prenota.photo}>
   <p class="lead">{ch.prenota.lead}</p>
