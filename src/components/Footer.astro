@@ -1,0 +1,158 @@
+---
+import Todo from './Todo.astro';
+import { navKeys, pathFor, t, type Lang } from '../i18n';
+import { restaurant } from '../data/restaurant';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const copy = t(lang);
+const a = restaurant.address;
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__brand">
+      <p class="site-footer__wordmark">Fairuz</p>
+      <p class="label label--link">{lang === 'it' ? 'Ristorante libanese · Parma' : 'Lebanese restaurant · Parma'}</p>
+    </div>
+
+    <div class="site-footer__grid">
+      <section aria-labelledby="f-where">
+        <h2 id="f-where" class="label">{copy.footer.where}</h2>
+        <address>
+          {a.street}<br />
+          {a.postalCode} {a.city}<br />
+          <a href={restaurant.mapsHref} target="_blank" rel="noopener noreferrer">
+            {copy.footer.openMap}<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+          </a>
+        </address>
+      </section>
+
+      <section aria-labelledby="f-contacts">
+        <h2 id="f-contacts" class="label">{copy.footer.contacts}</h2>
+        <ul role="list">
+          <li><a href={restaurant.phoneHref}>{restaurant.phone}</a></li>
+          <li><a href={`mailto:${restaurant.email}`}>{restaurant.email}</a></li>
+          <li>
+            <a href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer">
+              {copy.footer.whatsapp}<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="f-hours">
+        <h2 id="f-hours" class="label">{copy.footer.hours}</h2>
+        {
+          restaurant.hours ? (
+            <p>{restaurant.hours}</p>
+          ) : (
+            <p>
+              <Todo>{lang === 'it' ? 'orari reali da confermare' : 'real opening hours to confirm'}</Todo>
+            </p>
+          )
+        }
+      </section>
+
+      <section aria-labelledby="f-follow">
+        <h2 id="f-follow" class="label">{copy.footer.follow}</h2>
+        <ul role="list">
+          <li>
+            <a href={restaurant.social.facebook} target="_blank" rel="noopener noreferrer">
+              Facebook<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+            </a>
+          </li>
+          <li>
+            <a href={restaurant.tripadvisor.url} target="_blank" rel="noopener noreferrer">
+              Tripadvisor<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+            </a>
+          </li>
+          <li>
+            {
+              restaurant.social.instagram ? (
+                <a href={restaurant.social.instagram} target="_blank" rel="noopener noreferrer">
+                  Instagram<span class="sr-only"> {copy.tripadvisor.newTab}</span>
+                </a>
+              ) : (
+                <Todo>Instagram</Todo>
+              )
+            }
+          </li>
+        </ul>
+      </section>
+
+      <nav aria-labelledby="f-explore">
+        <h2 id="f-explore" class="label">{copy.footer.explore}</h2>
+        <ul role="list">
+          {navKeys.map((key) => <li><a href={pathFor(key, lang)}>{copy.nav[key]}</a></li>)}
+        </ul>
+      </nav>
+    </div>
+
+    <p class="site-footer__legal">{copy.footer.legal}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--section-y);
+    padding-block: var(--space-8) var(--space-7);
+    background: var(--night);
+    color: var(--night-fg);
+  }
+  /* Superficie "notte" fissa (uguale in chiaro e scuro): testo 14.6:1, accento 8:1. */
+  .site-footer a {
+    color: var(--night-fg);
+  }
+  .site-footer a:hover {
+    color: var(--night-accent);
+  }
+  .site-footer :focus-visible {
+    outline-color: var(--night-accent);
+  }
+  .site-footer__brand {
+    margin-bottom: var(--space-7);
+  }
+  .site-footer__wordmark {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--step-5);
+    line-height: var(--lh-tight);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .site-footer .label--link {
+    color: var(--night-accent);
+  }
+  .site-footer__grid {
+    display: grid;
+    gap: var(--space-6) var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    padding-block: var(--space-6);
+    border-block: var(--rule-w) solid color-mix(in srgb, var(--night-fg) 30%, transparent);
+  }
+  .site-footer h2 {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    color: var(--night-accent);
+    margin-bottom: var(--space-3);
+  }
+  .site-footer address {
+    font-style: normal;
+  }
+  .site-footer li + li {
+    margin-top: var(--space-2);
+  }
+  .site-footer a {
+    display: inline-block;
+    padding-block: var(--space-1);
+  }
+  .site-footer__legal {
+    margin-top: var(--space-6);
+    font-size: var(--step--1);
+    opacity: 0.85;
+    max-width: 60ch;
+  }
+</style>
