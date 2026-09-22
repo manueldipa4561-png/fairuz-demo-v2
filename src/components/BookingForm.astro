@@ -52,6 +52,7 @@ const c = {
   data-closed-label={restaurant.closedDay}
   data-wa={restaurant.whatsappHref}
 >
+  <div class="confetti" data-confetti aria-hidden="true"></div>
   <p class="booking__demo">
     <span class="label booking__badge">{c.demo}</span>
     {c.demoText}
@@ -194,6 +195,38 @@ const c = {
     }
   }
 
+  // Pioggia di coriandoli a schermo intero: il vero momento "wow", coreografato dopo lo scintillio
+  // vicino al segno di spunta. Forme e colori del brand (rombo, striscia, pallino; turchese/brace/blush/
+  // ink), non coriandoli arcobaleno generici. Solo transform+opacity (GPU), spenta con movimento ridotto,
+  // e i pezzi si ripuliscono da soli così una nuova prenotazione riparte da zero.
+  function rainConfetti(container: HTMLElement | null | undefined) {
+    if (!container || !canBurst) return;
+    container.innerHTML = '';
+    const colors = ['var(--turquoise)', 'var(--brace)', 'var(--blush)', 'var(--night-accent)', 'var(--ink)'];
+    const shapes = ['confetti__piece--diamond', 'confetti__piece--bar', 'confetti__piece--dot'];
+    const total = 64;
+    let longestMs = 0;
+    for (let i = 0; i < total; i++) {
+      const piece = document.createElement('span');
+      const duration = 2200 + Math.random() * 1400;
+      const delay = Math.random() * 500;
+      longestMs = Math.max(longestMs, duration + delay);
+      piece.className = `confetti__piece ${shapes[i % shapes.length]}`;
+      piece.style.cssText = [
+        `--x:${(Math.random() * 100).toFixed(1)}vw`,
+        `--drift:${(Math.random() * 140 - 70).toFixed(0)}px`,
+        `--rot:${(Math.random() * 900 - 450).toFixed(0)}deg`,
+        `--duration:${duration.toFixed(0)}ms`,
+        `--delay:${delay.toFixed(0)}ms`,
+        `background:${colors[i % colors.length]}`,
+      ].join('; ');
+      container.appendChild(piece);
+    }
+    setTimeout(() => {
+      container.innerHTML = '';
+    }, longestMs + 200);
+  }
+
   const root = document.querySelector<HTMLElement>('[data-booking]');
   if (root) {
     const form = root.querySelector<HTMLFormElement>('[data-booking-form]')!;
@@ -319,6 +352,7 @@ const c = {
       result.hidden = false;
       resultTitle.focus();
       burstSparks(result.querySelector<HTMLElement>('[data-spark-burst]'));
+      rainConfetti(root.querySelector<HTMLElement>('[data-confetti]'));
 
       // Il coupon compare dopo il segno di spunta, come uno sblocco: il CSS ritarda l'animazione
       // (vedi .coupon--in), qui basta smettere di nasconderlo e attivarla se il movimento è permesso.
@@ -522,7 +556,8 @@ const c = {
     stroke-linejoin: round;
   }
 
-  /* Scintille della conferma: 14 puntini generati via JS, ognuno vola verso --dx/--dy e sfuma. */
+  /* Scintille della conferma: 14 puntini generati via JS, ognuno vola verso --dx/--dy e sfuma.
+     Lo stile dei puntini stessi è nel blocco is:global più sotto (vedi il perché lì). */
   .spark-burst {
     position: absolute;
     top: 1.75rem;
@@ -531,24 +566,16 @@ const c = {
     height: 0;
     pointer-events: none;
   }
-  .spark-burst span {
-    position: absolute;
+
+  /* Pioggia di coriandoli a schermo intero (rainConfetti nello script): forme e colori del brand,
+     non un plugin generico. Sopra grana (200) e barra di scroll (210), sotto niente: è il momento clou.
+     Lo stile dei singoli pezzi è anch'esso nel blocco is:global più sotto. */
+  .confetti {
+    position: fixed;
     inset: 0;
-    width: 0.4rem;
-    height: 0.4rem;
-    margin: -0.2rem;
-    border-radius: 50%;
-    animation: spark-fly 650ms var(--ease-out) both;
-  }
-  @keyframes spark-fly {
-    from {
-      translate: 0 0;
-      opacity: 1;
-    }
-    to {
-      translate: var(--dx) var(--dy);
-      opacity: 0;
-    }
+    z-index: 220;
+    overflow: hidden;
+    pointer-events: none;
   }
   .tick__ring,
   .tick__mark {
@@ -706,6 +733,74 @@ const c = {
     }
     .booking__row--2 {
       grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>
+
+<!--
+  Astro attribuisce l'hash di scope a OGNI segmento di un selettore (anche i discendenti), non solo
+  al primo: ".spark-burst span" compila come ".spark-burst[data-astro-cid] span[data-astro-cid]".
+  Gli <span> delle scintille e i pezzi dei coriandoli nascono via JS dopo il render e non portano
+  quell'attributo, quindi le regole scoped non li avrebbero mai raggiunti (verificato: senza questo
+  blocco i pezzi restavano a 0×0, invisibili). Questo blocco is:global copre solo quei selettori;
+  i contenitori (.spark-burst, .confetti) restano scoped qui sopra.
+-->
+<style is:global>
+  .spark-burst span {
+    position: absolute;
+    inset: 0;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin: -0.2rem;
+    border-radius: 50%;
+    animation: spark-fly 650ms var(--ease-out) both;
+  }
+  @keyframes spark-fly {
+    from {
+      translate: 0 0;
+      opacity: 1;
+    }
+    to {
+      translate: var(--dx) var(--dy);
+      opacity: 0;
+    }
+  }
+
+  .confetti .confetti__piece {
+    position: absolute;
+    top: -5vh;
+    left: var(--x);
+    width: 0.6rem;
+    height: 0.6rem;
+    animation: confetti-fall var(--duration) cubic-bezier(0.36, 0, 0.66, 1) var(--delay) both;
+  }
+  .confetti .confetti__piece--diamond {
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  }
+  .confetti .confetti__piece--bar {
+    width: 0.35rem;
+    height: 0.9rem;
+    border-radius: 1px;
+  }
+  .confetti .confetti__piece--dot {
+    border-radius: 50%;
+  }
+  /* Caduta con oscillazione: deriva orizzontale (va e torna) mentre ruota e precipita, più
+     realistico di una linea retta; sfuma solo negli ultimi istanti. */
+  @keyframes confetti-fall {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 1;
+    }
+    45% {
+      transform: translate(calc(var(--drift) * 1), 55vh) rotate(calc(var(--rot) * 0.6));
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(calc(var(--drift) * -0.6), 110vh) rotate(var(--rot));
+      opacity: 0;
     }
   }
 </style>
