@@ -43,4 +43,5 @@ Tutto ciò che in questa demo compare come **TODO** (riquadro tratteggiato) va c
 - [ ] Gift card / buoni regalo
 - [ ] Catering & eventi privati
 - [ ] Newsletter / lista eventi
+- [ ] **Sconto 10% alla prima prenotazione** (mostrato nel modulo di prenotazione demo, codice "BENVENUTO10", marcato "Esempio"): da confermare con il cliente se attivarlo davvero, con quali termini (validità, verifica in sala, esclusioni) e come tracciare "la prima volta" senza un vero sistema di prenotazioni/account.
 - ✗ Ordini d'asporto online: esclusi su indicazione di Punto Due Studio.
