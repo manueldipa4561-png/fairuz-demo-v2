@@ -1,0 +1,63 @@
+{
+  "$comment": "Fairuz — export dei design token (direzione 'Turchese & Carta'). Fonte di verità: src/styles/tokens.css. Contrasti verificati con scripts/contrast.mjs.",
+  "name": "Fairuz — Turchese & Carta",
+  "themes": ["light", "dark"],
+  "color": {
+    "paper": { "light": "#f4ecdd", "dark": "#171310", "usage": "Sfondo pagina (carta calda)." },
+    "surface": { "light": "#fbf7ef", "dark": "#221d19", "usage": "Superfici sollevate: card, campi." },
+    "ink": { "light": "#1e1b18", "dark": "#f4ecdd", "usage": "Testo principale (4.5:1+)." },
+    "ink-soft": { "light": "#5a5048", "dark": "#b9ac9d", "usage": "Testo secondario (4.5:1+)." },
+    "turquoise": { "light": "#1e9e93", "dark": "#3cc4b7", "usage": "Firma. Solo riempimenti/decoro con testo scuro; mai testo su carta, mai bianco sopra." },
+    "link": { "light": "#14746b", "dark": "#4fd1c5", "usage": "Testo, link, etichette, bordi e focus su carta (4.8:1)." },
+    "brace": { "light": "#b93826", "dark": "#e5674f", "usage": "Fuoco / CTA. Bianco su brace (5.7:1) o testo su carta (4.9:1)." },
+    "on-brace": { "light": "#ffffff", "dark": "#171310", "usage": "Testo sopra un riempimento brace." },
+    "blush": { "light": "#d3bdc5", "dark": "#d3bdc5", "usage": "Solo decoro (rombi, campiture). Mai testo." },
+    "night": { "light": "#1e1b18", "dark": "#1e1b18", "usage": "Superficie notte fissa (footer, capitoli scuri)." },
+    "night-fg": { "light": "#f4ecdd", "dark": "#f4ecdd", "usage": "Testo su night (14.6:1)." },
+    "night-accent": { "light": "#3cc4b7", "dark": "#3cc4b7", "usage": "Link/etichette su night (8:1)." },
+    "night-warn": { "light": "#e5674f", "dark": "#e5674f", "usage": "Segnale caldo su night (5.2:1)." },
+    "rule-strong": { "light": "#1e1b18", "dark": "#f4ecdd", "usage": "Bordi netti (= ink)." }
+  },
+  "typography": {
+    "families": {
+      "display": "'Playfair Display', Georgia, serif",
+      "body": "'Karla', system-ui, sans-serif",
+      "mono": "'JetBrains Mono', ui-monospace, monospace"
+    },
+    "scale_fluid": {
+      "$comment": "clamp(min @375px, max @1440px)",
+      "step--2": "clamp(0.75rem, 0.73rem + 0.1vw, 0.8125rem)",
+      "step--1": "clamp(0.875rem, 0.85rem + 0.12vw, 0.9375rem)",
+      "step-0": "clamp(1rem, 0.96rem + 0.2vw, 1.125rem)",
+      "step-1": "clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem)",
+      "step-2": "clamp(1.5rem, 1.3rem + 1vw, 2.125rem)",
+      "step-3": "clamp(2rem, 1.6rem + 2vw, 3.25rem)",
+      "step-4": "clamp(2.5rem, 1.8rem + 3.5vw, 4.75rem)",
+      "step-5": "clamp(3.25rem, 2rem + 6.2vw, 8rem)"
+    },
+    "line_height": { "tight": 1.02, "snug": 1.2, "body": 1.6 },
+    "tracking_label": "0.14em"
+  },
+  "spacing": {
+    "$comment": "base 4px",
+    "space-1": "0.25rem",
+    "space-2": "0.5rem",
+    "space-3": "0.75rem",
+    "space-4": "1rem",
+    "space-5": "1.5rem",
+    "space-6": "2rem",
+    "space-7": "3rem",
+    "space-8": "4.5rem",
+    "space-9": "7rem"
+  },
+  "radius": { "sm": "2px", "md": "6px", "pill": "999px" },
+  "layout": { "container": "80rem", "measure": "62ch", "touch-min": "2.75rem", "header-h": "4.5rem" },
+  "motion": {
+    "ease-out": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "ease-inout": "cubic-bezier(0.65, 0, 0.35, 1)",
+    "dur-fast": "160ms",
+    "dur-base": "320ms",
+    "dur-slow": "720ms",
+    "$comment": "Tutto rispetta prefers-reduced-motion."
+  }
+}
