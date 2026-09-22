@@ -195,30 +195,52 @@ const c = {
     }
   }
 
-  // Pioggia di coriandoli a schermo intero: il vero momento "wow", coreografato dopo lo scintillio
-  // vicino al segno di spunta. Forme e colori del brand (rombo, striscia, pallino; turchese/brace/blush/
-  // ink), non coriandoli arcobaleno generici. Solo transform+opacity (GPU), spenta con movimento ridotto,
-  // e i pezzi si ripuliscono da soli così una nuova prenotazione riparte da zero.
-  function rainConfetti(container: HTMLElement | null | undefined) {
+  // Coriandoli "a petardo": partono dal segno di spunta (non da una riga in alto allo schermo come
+  // le pioggie generiche), si aprono a ventaglio verso l'alto, poi la gravità li fa ricadere oltre il
+  // fondo mentre tumbano in 3D (rotateX+rotateY, non un solo asse piatto). Forme e colori del brand
+  // (rombo pieno, rombo a contorno, striscia, pallino; turchese/brace/blush/ink), non un plugin
+  // generico. Solo transform+opacity (GPU), spenta con movimento ridotto; i pezzi si ripuliscono da
+  // soli così una nuova prenotazione riparte da zero.
+  function rainConfetti(container: HTMLElement | null | undefined, originEl?: HTMLElement | null) {
     if (!container || !canBurst) return;
     container.innerHTML = '';
+    const originRect = originEl?.getBoundingClientRect();
+    const ox = originRect ? originRect.left + originRect.width / 2 : window.innerWidth / 2;
+    const oy = originRect ? originRect.top + originRect.height / 2 : window.innerHeight * 0.22;
     const colors = ['var(--turquoise)', 'var(--brace)', 'var(--blush)', 'var(--night-accent)', 'var(--ink)'];
-    const shapes = ['confetti__piece--diamond', 'confetti__piece--bar', 'confetti__piece--dot'];
-    const total = 64;
+    const shapes = ['confetti__piece--diamond', 'confetti__piece--outline', 'confetti__piece--bar', 'confetti__piece--dot'];
+    const total = 70;
     let longestMs = 0;
     for (let i = 0; i < total; i++) {
       const piece = document.createElement('span');
-      const duration = 2200 + Math.random() * 1400;
-      const delay = Math.random() * 500;
+      const shape = shapes[i % shapes.length];
+      piece.className = `confetti__piece ${shape}`;
+
+      // Ventaglio verso l'alto (-20° … -160°): mai verso il basso al lancio, come un vero petardo.
+      const angle = ((-20 - Math.random() * 140) * Math.PI) / 180;
+      const launchDist = 70 + Math.random() * 200;
+      const launchX = Math.cos(angle) * launchDist;
+      const launchY = Math.sin(angle) * launchDist;
+      const drift = (Math.random() - 0.5) * 260;
+      const landY = window.innerHeight - oy + 140;
+
+      const duration = 2400 + Math.random() * 1600;
+      const delay = Math.random() * 260;
       longestMs = Math.max(longestMs, duration + delay);
-      piece.className = `confetti__piece ${shapes[i % shapes.length]}`;
+
       piece.style.cssText = [
-        `--x:${(Math.random() * 100).toFixed(1)}vw`,
-        `--drift:${(Math.random() * 140 - 70).toFixed(0)}px`,
-        `--rot:${(Math.random() * 900 - 450).toFixed(0)}deg`,
+        `left:${ox.toFixed(0)}px`,
+        `top:${oy.toFixed(0)}px`,
+        `--launch-x:${launchX.toFixed(0)}px`,
+        `--launch-y:${launchY.toFixed(0)}px`,
+        `--land-x:${(launchX + drift).toFixed(0)}px`,
+        `--land-y:${landY.toFixed(0)}px`,
+        `--spin-x:${(Math.random() * 640 - 320).toFixed(0)}deg`,
+        `--spin-y:${(Math.random() * 640 - 320).toFixed(0)}deg`,
+        `--scale:${(0.7 + Math.random() * 0.9).toFixed(2)}`,
         `--duration:${duration.toFixed(0)}ms`,
         `--delay:${delay.toFixed(0)}ms`,
-        `background:${colors[i % colors.length]}`,
+        shape === 'confetti__piece--outline' ? `border-color:${colors[i % colors.length]}` : `background:${colors[i % colors.length]}`,
       ].join('; ');
       container.appendChild(piece);
     }
@@ -352,7 +374,7 @@ const c = {
       result.hidden = false;
       resultTitle.focus();
       burstSparks(result.querySelector<HTMLElement>('[data-spark-burst]'));
-      rainConfetti(root.querySelector<HTMLElement>('[data-confetti]'));
+      rainConfetti(root.querySelector<HTMLElement>('[data-confetti]'), result.querySelector<HTMLElement>('.tick'));
 
       // Il coupon compare dopo il segno di spunta, come uno sblocco: il CSS ritarda l'animazione
       // (vedi .coupon--in), qui basta smettere di nasconderlo e attivarla se il movimento è permesso.
@@ -766,40 +788,56 @@ const c = {
     }
   }
 
+  /* left/top fissano il punto di lancio (il segno di spunta, calcolato in JS); tutto il resto
+     del moto è nel transform, come delta da quel punto — vedi confetti-cannon più sotto. */
   .confetti .confetti__piece {
     position: absolute;
-    top: -5vh;
-    left: var(--x);
+    top: 0;
+    left: 0;
     width: 0.6rem;
     height: 0.6rem;
-    animation: confetti-fall var(--duration) cubic-bezier(0.36, 0, 0.66, 1) var(--delay) both;
+    animation: confetti-cannon var(--duration) linear var(--delay) both;
   }
   .confetti .confetti__piece--diamond {
     clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
   }
+  .confetti .confetti__piece--outline {
+    background: none;
+    border: 0.11rem solid;
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  }
   .confetti .confetti__piece--bar {
-    width: 0.35rem;
-    height: 0.9rem;
+    width: 0.3rem;
+    height: 1.15rem;
     border-radius: 1px;
   }
   .confetti .confetti__piece--dot {
     border-radius: 50%;
   }
-  /* Caduta con oscillazione: deriva orizzontale (va e torna) mentre ruota e precipita, più
-     realistico di una linea retta; sfuma solo negli ultimi istanti. */
-  @keyframes confetti-fall {
+  /* Lancio a petardo (0→32%, decelera come uno scatto) poi caduta sotto gravità (32→100%, accelera):
+     due firme di easing diverse, non un'unica curva piatta — è quello che distingue un vero "botto"
+     da una pioggia generica. Il tumbling 3D (rotateX+rotateY con perspective() per pezzo) continua
+     per tutta la durata; la scala varia da pezzo a pezzo per una resa più ricca. */
+  @keyframes confetti-cannon {
     0% {
-      transform: translate(0, 0) rotate(0deg);
+      transform: perspective(480px) translate(0, 0) rotateX(0deg) rotateY(0deg) scale(0);
+      opacity: 0;
+      animation-timing-function: cubic-bezier(0.17, 0.84, 0.44, 1);
+    }
+    10% {
       opacity: 1;
     }
-    45% {
-      transform: translate(calc(var(--drift) * 1), 55vh) rotate(calc(var(--rot) * 0.6));
+    32% {
+      transform: perspective(480px) translate(var(--launch-x), var(--launch-y)) rotateX(calc(var(--spin-x) * 0.35))
+        rotateY(calc(var(--spin-y) * 0.35)) scale(var(--scale));
+      animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
     }
-    85% {
+    82% {
       opacity: 1;
     }
     100% {
-      transform: translate(calc(var(--drift) * -0.6), 110vh) rotate(var(--rot));
+      transform: perspective(480px) translate(var(--land-x), var(--land-y)) rotateX(var(--spin-x)) rotateY(var(--spin-y))
+        scale(var(--scale));
       opacity: 0;
     }
   }
