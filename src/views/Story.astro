@@ -2,8 +2,9 @@
 import CtaBand from '../components/CtaBand.astro';
 import PageHero from '../components/PageHero.astro';
 import PhotoFrame from '../components/PhotoFrame.astro';
-import Todo from '../components/Todo.astro';
+import Sample from '../components/Sample.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
+import { findPhoto } from '../lib/photo';
 import { pathFor, type Lang } from '../i18n';
 
 interface Props {
@@ -17,52 +18,59 @@ const c = {
   eyebrow: 'Storia',
   title: 'La nostra storia',
   intro: 'Il Libano a Parma, raccontato a tavola.',
+  sampleNote: 'Testi dimostrativi: la storia reale la racconta Fairuz.',
   chapters: [
     {
       id: 'origini',
       kicker: 'Le origini',
-      todo: 'storia reale di Fairuz: famiglia, origini del locale e dei piatti (testi da ricevere dal cliente)',
-      photo: 'foto reale: il locale',
+      body: 'Fairuz nasce dal desiderio di portare a Parma la tavola libanese: quella in cui il cibo è prima di tutto un gesto di ospitalità. Ogni piatto racconta un pezzo di Mediterraneo, tra spezie, brace e pane condiviso.',
+      file: 'locale',
+      alt: 'Il locale di Fairuz',
     },
     {
       id: 'cucina',
       kicker: 'La cucina',
-      todo: 'la cucina raccontata dal cliente: ricette, ingredienti, modo di lavorare (testi da ricevere)',
-      photo: 'foto reale: la cucina e i piatti',
+      body: 'Tutto parte dalla brace e dalle mani: le mezze preparate ogni giorno, le grigliate marinate a lungo, i dolci che chiudono il pasto. Sapori tradizionali, senza scorciatoie, come si fa a casa.',
+      file: 'tavola-iftar',
+      alt: 'Hummus e mezze su una tavola apparecchiata',
     },
     {
       id: 'persone',
       kicker: 'Le persone',
-      todo: 'le persone di Fairuz: chi c’è in cucina e in sala (testi e consenso a pubblicare i nomi da ricevere)',
-      photo: 'foto reale: il team',
+      body: 'Dietro ogni serata c’è chi accoglie in sala e chi lavora alla griglia. È da qui che nasce il modo di stare a tavola di Fairuz: senza fretta, come tra ospiti.',
+      file: 'chef-strada',
+      alt: 'Lo chef di Fairuz che prepara i piatti',
     },
   ],
   nameTitle: 'Il nome',
-  nameTodo: 'origine del nome “Fairuz”: da chiedere al cliente, non dedurla',
+  nameBody: '«Fairuz» è un nome che nel mondo arabo evoca musica, luce e ospitalità. Per noi è soprattutto un invito: sedersi, condividere, sentirsi a casa.',
   menuCta: 'Scopri il menu',
   bandTitle: 'La storia continua a tavola.',
 };
+const chapters = c.chapters.map((ch) => ({ ...ch, hasPhoto: Boolean(findPhoto(ch.file)) }));
 ---
 
-<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro} />
+<PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
+  <p class="story-note"><Sample /> {c.sampleNote}</p>
+</PageHero>
 
 {
-  c.chapters.map((ch, i) => (
+  chapters.map((ch, i) => (
     <section class:list={['story', { 'story--flip': i % 2 === 1 }]} id={ch.id} aria-labelledby={`${ch.id}-title`}>
-      <div class="container story__grid">
+      <div class:list={['container story__grid', { 'story__grid--single': !ch.hasPhoto }]}>
         <div class="story__text">
           <p class="label label--link story__index">
             <span>{String(i + 1).padStart(2, '0')}</span>
             <span>{ch.kicker}</span>
           </p>
           <h2 id={`${ch.id}-title`}>{ch.kicker}</h2>
-          <p class="story__body">
-            <Todo>{ch.todo}</Todo>
-          </p>
+          <p class="story__body story__body--dropcap">{ch.body}</p>
         </div>
-        <div class="story__photo">
-          <PhotoFrame todo={ch.photo} />
-        </div>
+        {ch.hasPhoto && (
+          <div class="story__photo">
+            <PhotoFrame name={ch.file} alt={ch.alt} />
+          </div>
+        )}
       </div>
     </section>
   ))
@@ -72,8 +80,8 @@ const c = {
 
 <section class="section" aria-labelledby="name">
   <div class="container stack">
-    <h2 id="name">{c.nameTitle}</h2>
-    <p><Todo>{c.nameTodo}</Todo></p>
+    <h2 id="name">{c.nameTitle} <Sample /></h2>
+    <p>{c.nameBody}</p>
     <p class="actions">
       <a class="btn btn--ghost" href={pathFor('menu', lang)}>{c.menuCta}</a>
     </p>
@@ -83,6 +91,9 @@ const c = {
 <CtaBand lang={lang} title={c.bandTitle} />
 
 <style>
+  .story-note {
+    margin-top: var(--space-5);
+  }
   .story {
     padding-block: var(--space-8);
     border-bottom: var(--rule-w) solid var(--rule);
@@ -107,6 +118,9 @@ const c = {
     border: var(--rule-w) solid currentColor;
     border-radius: var(--radius-pill);
   }
+  .story__grid--single .story__text {
+    max-width: 44rem;
+  }
   .story__photo {
     --photo-ratio: 4 / 3;
     width: 100%;
@@ -115,7 +129,7 @@ const c = {
   }
 
   @media (min-width: 60rem) {
-    .story__grid {
+    .story__grid:not(.story__grid--single) {
       grid-template-columns: 1fr 1fr;
       gap: var(--space-8);
     }

@@ -1,9 +1,10 @@
 ---
 /**
  * Capitolo della home cinematica. La parola gigante è il vero <h2> della sezione.
- * Slot: default = testo, "art" = disegno SVG. `photoTodo` crea la cornice per la foto reale (manca ancora).
+ * Slot: default = testo, "art" = disegno SVG. `photoName` (file in public/photos) mostra la foto se esiste.
  */
 import PhotoFrame from '../PhotoFrame.astro';
+import { findPhoto } from '../../lib/photo';
 
 interface Props {
   id: string;
@@ -13,9 +14,12 @@ interface Props {
   tone?: 'paper' | 'night' | 'brace';
   /** Pinnato durante lo scroll su desktop (home.ts). */
   pin?: boolean;
-  photoTodo?: string;
+  /** Nome del file in public/photos (senza estensione) e testo alternativo. */
+  photoName?: string;
+  photoAlt?: string;
 }
-const { id, index, kicker, word, tone = 'paper', pin = false, photoTodo } = Astro.props;
+const { id, index, kicker, word, tone = 'paper', pin = false, photoName, photoAlt } = Astro.props;
+const hasPhoto = Boolean(findPhoto(photoName));
 ---
 
 <section
@@ -31,13 +35,13 @@ const { id, index, kicker, word, tone = 'paper', pin = false, photoTodo } = Astr
       <span>{kicker}</span>
     </p>
     <h2 class="chapter__word" id={`${id}-title`} data-chapter-word>{word}</h2>
-    <div class="chapter__grid">
+    <div class:list={['chapter__grid', { 'chapter__grid--nophoto': !hasPhoto }]}>
       <div class="chapter__text" data-chapter-text><slot /></div>
       <div class="chapter__art"><slot name="art" /></div>
       {
-        photoTodo && (
+        hasPhoto && (
           <div class="chapter__photo" data-chapter-photo>
-            <PhotoFrame todo={photoTodo} />
+            <PhotoFrame name={photoName} alt={photoAlt} />
           </div>
         )
       }
@@ -161,6 +165,9 @@ const { id, index, kicker, word, tone = 'paper', pin = false, photoTodo } = Astr
     }
     .chapter__grid {
       grid-template-columns: 5fr 4fr 3fr;
+    }
+    .chapter__grid--nophoto {
+      grid-template-columns: 1fr 1fr;
     }
     .chapter__photo {
       --photo-ratio: 4 / 5;

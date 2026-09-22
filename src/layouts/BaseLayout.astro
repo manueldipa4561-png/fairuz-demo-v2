@@ -88,6 +88,8 @@ const schema = withSchema ? restaurantSchema(lang, site, ogImage) : null;
     {schema && <script type="application/ld+json" set:html={JSON.stringify(schema)} />}
   </head>
   <body>
+    <div class="scroll-progress" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
     <a class="skip-link" href="#main">{copy.skip}</a>
     <DemoStrip lang={lang} />
     <Header lang={lang} pageKey={pageKey} />
@@ -95,5 +97,8 @@ const schema = withSchema ? restaurantSchema(lang, site, ogImage) : null;
       <slot />
     </main>
     <Footer lang={lang} />
+    <script>
+      import '../scripts/tilt';
+    </script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 ---
-import Todo from './Todo.astro';
+import Sample from './Sample.astro';
+import { hoursAreSample, sampleHours } from '../data/hours';
 import { navKeys, pathFor, t, type Lang } from '../i18n';
 import { restaurant } from '../data/restaurant';
 
@@ -46,15 +47,8 @@ const a = restaurant.address;
       <div class="footer-col">
         <h2 id="f-hours" class="label">{copy.footer.hours}</h2>
         <p>{lang === 'it' ? `Chiuso il ${restaurant.closedDay}.` : `Closed on Tuesdays.`}</p>
-        {
-          restaurant.hours ? (
-            <p>{restaurant.hours}</p>
-          ) : (
-            <p>
-              <Todo>{lang === 'it' ? 'fasce orarie di pranzo e cena da confermare' : 'lunch and dinner hours to confirm'}</Todo>
-            </p>
-          )
-        }
+        <p>{sampleHours.days} · {sampleHours.lunch}<br />{sampleHours.days} · {sampleHours.dinner}</p>
+        {hoursAreSample && <p><Sample label={lang === 'it' ? 'Orari di esempio' : 'Sample hours'} /></p>}
       </div>
 
       <div class="footer-col">
@@ -70,17 +64,15 @@ const a = restaurant.address;
               Tripadvisor<span class="sr-only"> {copy.tripadvisor.newTab}</span>
             </a>
           </li>
-          <li>
-            {
-              restaurant.social.instagram ? (
+          {
+            restaurant.social.instagram && (
+              <li>
                 <a href={restaurant.social.instagram} target="_blank" rel="noopener noreferrer">
                   Instagram<span class="sr-only"> {copy.tripadvisor.newTab}</span>
                 </a>
-              ) : (
-                <Todo>Instagram</Todo>
-              )
-            }
-          </li>
+              </li>
+            )
+          }
         </ul>
       </div>
 

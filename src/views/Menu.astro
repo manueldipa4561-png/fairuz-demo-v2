@@ -2,8 +2,10 @@
 import CtaBand from '../components/CtaBand.astro';
 import DishCard from '../components/DishCard.astro';
 import PageHero from '../components/PageHero.astro';
-import Todo from '../components/Todo.astro';
-import { menuCategories } from '../data/menu';
+import Sample from '../components/Sample.astro';
+import { menuCategories, menuIsSample } from '../data/menu';
+import PhotoFrame from '../components/PhotoFrame.astro';
+import { findPhoto } from '../lib/photo';
 import { restaurant } from '../data/restaurant';
 import { t, type Lang } from '../i18n';
 
@@ -19,24 +21,29 @@ const c = {
   title: 'Il menu',
   intro: 'Cucina libanese: mezze, grigliate, falafel e dolci.',
   navLabel: 'Categorie del menu',
-  categoriesTodo: 'categorie provvisorie (mezze, grigliate, falafel, dolci): da allineare al menu reale',
-  dishTodo: 'piatti, descrizioni e prezzi di questa categoria dal menu reale di Fairuz',
+  dishEmpty: 'I piatti di questa categoria arrivano presto.',
+  sampleNote: 'Menu dimostrativo con piatti tipici libanesi. I piatti e i prezzi reali arrivano dal cliente.',
+  lunchTitle: 'Formula pranzo',
+  lunchText: 'Piatto del giorno con bevanda inclusa — 15 € (da confermare).',
   dietTitle: 'Allergeni e diete',
-  dietTodo:
-    'informazioni su allergeni e diete (senza glutine, halal, vegane, vegetariane): da verificare e confermare con il cliente prima di mostrarle',
+  dietText: 'Hai allergie o intolleranze? Comunicalo al momento della prenotazione o al tavolo.',
   legacy: 'Nel frattempo il menu completo è consultabile sul sito attuale',
   legacyCta: 'Apri il menu attuale',
   newTab: copy.tripadvisor.newTab,
   bandTitle: 'Hai scelto? Ti aspettiamo a tavola.',
+  surprise: 'Sorprendimi',
 };
+const hasLunchPhoto = Boolean(findPhoto('pranzo'));
 ---
 
 <PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
-  <p class="menu-note"><Todo>{c.categoriesTodo}</Todo></p>
+  {menuIsSample && (
+    <p class="menu-note"><Sample /> {c.sampleNote}</p>
+  )}
 </PageHero>
 
 <nav class="menu-nav" aria-label={c.navLabel} data-menu-nav>
-  <div class="container">
+  <div class="container menu-nav__row">
     <ul role="list">
       {
         menuCategories.map((cat) => (
@@ -46,6 +53,12 @@ const c = {
         ))
       }
     </ul>
+    <button class="label menu-surprise" type="button" data-surprise>
+      <svg class="menu-surprise__mark" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M8 1 L15 8 L8 15 L1 8 Z"></path>
+      </svg>
+      {c.surprise}
+    </button>
   </div>
 </nav>
 
@@ -61,9 +74,7 @@ const c = {
             cat.items.map((dish) => <DishCard dish={dish} />)
           ) : (
             <DishCard>
-              <p>
-                <Todo>{c.dishTodo}</Todo>
-              </p>
+              <p>{c.dishEmpty}</p>
             </DishCard>
           )}
         </div>
@@ -72,10 +83,26 @@ const c = {
   ))
 }
 
+<section class="section menu-lunch" aria-labelledby="lunch">
+  <div class="container">
+    <div class:list={['lunch-card', { 'lunch-card--photo': hasLunchPhoto }]}>
+      <div class="lunch-card__text">
+        <h2 id="lunch">{c.lunchTitle} <Sample /></h2>
+        <p>{c.lunchText}</p>
+      </div>
+      {hasLunchPhoto && (
+        <div class="lunch-card__photo">
+          <PhotoFrame name="pranzo" alt="Locandina della formula Lunch Time: piatto con riso e spiedino, bevande incluse" />
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
 <section class="section menu-diet" aria-labelledby="diet">
   <div class="container stack">
     <h2 id="diet">{c.dietTitle}</h2>
-    <p><Todo>{c.dietTodo}</Todo></p>
+    <p>{c.dietText}</p>
     <p>
       {c.legacy}:
       <a href={restaurant.legacySiteUrl} target="_blank" rel="noopener noreferrer">
@@ -108,6 +135,21 @@ const c = {
       if (section) io.observe(section);
     });
   }
+
+  // "Sorprendimi": sceglie un piatto a caso, ci scorre e lo evidenzia con un piccolo balzo.
+  const surpriseBtn = document.querySelector<HTMLButtonElement>('[data-surprise]');
+  surpriseBtn?.addEventListener('click', () => {
+    const dishes = Array.from(document.querySelectorAll<HTMLElement>('[data-dish]'));
+    if (!dishes.length) return;
+    // Evita di ripescare subito lo stesso piatto due volte di fila.
+    const prev = dishes.find((d) => d.classList.contains('dish--surprise'));
+    dishes.forEach((d) => d.classList.remove('dish--surprise'));
+    const pool = dishes.length > 1 ? dishes.filter((d) => d !== prev) : dishes;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    pick.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Riavvia l'animazione anche se il piatto era già evidenziato in un giro precedente.
+    requestAnimationFrame(() => pick.classList.add('dish--surprise'));
+  });
 </script>
 
 <style>
@@ -123,6 +165,12 @@ const c = {
     -webkit-backdrop-filter: blur(10px);
     border-bottom: var(--rule-w) solid var(--rule);
   }
+  .menu-nav__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
   .menu-nav ul {
     display: flex;
     gap: var(--space-2);
@@ -130,6 +178,50 @@ const c = {
     padding-block: var(--space-2);
     overflow-x: auto;
     scrollbar-width: none;
+  }
+  .menu-surprise {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch-min);
+    padding-inline: var(--space-4);
+    background: transparent;
+    color: var(--link);
+    border: var(--rule-w) dashed var(--link);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+  }
+  .menu-surprise:hover {
+    background: var(--turquoise);
+    color: var(--night);
+    border-style: solid;
+  }
+  .menu-surprise:active {
+    scale: 0.96;
+  }
+  .menu-surprise__mark {
+    width: 0.85rem;
+    height: 0.85rem;
+    fill: currentColor;
+    transition: rotate var(--dur-base) var(--ease-out);
+  }
+  .menu-surprise:hover .menu-surprise__mark {
+    rotate: 90deg;
+  }
+  @media (max-width: 34rem) {
+    .menu-nav__row {
+      flex-direction: column;
+      align-items: stretch;
+      padding-block: var(--space-2);
+    }
+    .menu-nav ul {
+      padding-block: 0 var(--space-2);
+    }
+    .menu-surprise {
+      justify-content: center;
+    }
   }
   .menu-nav a {
     display: inline-flex;
@@ -160,5 +252,39 @@ const c = {
   }
   .menu-diet {
     padding-block: var(--space-8);
+  }
+  .menu-lunch {
+    padding-block: 0;
+  }
+  .lunch-card {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-md);
+  }
+  .lunch-card__text {
+    display: grid;
+    gap: var(--space-2);
+    align-content: center;
+  }
+  .lunch-card__photo {
+    --photo-ratio: 4 / 5;
+    width: 100%;
+    max-width: 18rem;
+  }
+  @media (min-width: 40rem) {
+    .lunch-card--photo {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: var(--space-6);
+    }
+  }
+  .lunch-card h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
   }
 </style>

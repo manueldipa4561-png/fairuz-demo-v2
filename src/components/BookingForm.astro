@@ -7,7 +7,8 @@
  * Progressive enhancement: senza JS il modulo è nascosto (html:not(.js)) e resta l'alternativa WhatsApp/telefono.
  */
 import { restaurant } from '../data/restaurant';
-import Todo from './Todo.astro';
+import Sample from './Sample.astro';
+import { hoursAreSample, sampleHours } from '../data/hours';
 
 const c = {
   demo: 'Demo',
@@ -19,7 +20,7 @@ const c = {
   phone: 'Telefono',
   notes: 'Note',
   optional: 'facoltative',
-  timeTodo: 'fasce orarie di servizio da confermare',
+  timeHint: `Servizio ${sampleHours.lunch} e ${sampleHours.dinner}`,
   submit: 'Richiedi il tavolo',
   less: 'Una persona in meno',
   more: 'Una persona in più',
@@ -30,10 +31,17 @@ const c = {
   resultTime: 'Ora',
   resultPeople: 'Persone',
   resultName: 'Nome',
-  resultTodo: 'invio reale e conferma della prenotazione: da collegare al sistema del cliente',
   whatsapp: 'Continua su WhatsApp',
+  addToCalendar: 'Aggiungi al calendario',
   edit: 'Modifica',
   newTab: '(si apre in una nuova scheda)',
+  couponKicker: 'Premio prima prenotazione',
+  couponNote: 'Esempio di promozione dimostrativa: sconto e codice non sono attivi, da confermare col cliente prima di usarli davvero.',
+  couponSub: 'sul conto alla tua prima visita da Fairuz',
+  couponCode: 'BENVENUTO10',
+  couponCopy: 'Copia codice',
+  couponCopied: 'Copiato',
+  couponCaption: 'Mostralo in sala: lo verifichiamo al tavolo.',
 };
 ---
 
@@ -61,7 +69,7 @@ const c = {
       <div class="field">
         <label for="b-time">{c.time}</label>
         <input id="b-time" name="time" type="time" required aria-describedby="b-time-hint b-time-err" />
-        <p class="field__hint" id="b-time-hint"><Todo>{c.timeTodo}</Todo></p>
+        <p class="field__hint" id="b-time-hint">{hoursAreSample && <Sample />} {c.timeHint}</p>
         <p class="field__error" id="b-time-err"></p>
       </div>
       <div class="field">
@@ -115,6 +123,7 @@ const c = {
   </form>
 
   <div class="booking__result" data-booking-result hidden>
+    <div class="spark-burst" data-spark-burst aria-hidden="true"></div>
     <svg class="tick" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
       <circle class="tick__ring" cx="26" cy="26" r="23" pathLength="1"></circle>
       <path class="tick__mark" d="M15 27 l8 8 l15 -17" pathLength="1"></path>
@@ -127,10 +136,39 @@ const c = {
       <div><dt>{c.resultPeople}</dt><dd data-out="people"></dd></div>
       <div><dt>{c.resultName}</dt><dd data-out="name"></dd></div>
     </dl>
-    <p><Todo>{c.resultTodo}</Todo></p>
+
+    <div class="coupon" data-coupon hidden>
+      <div class="coupon__shine" aria-hidden="true"></div>
+      <div class="coupon__head">
+        <p class="label coupon__kicker">{c.couponKicker}</p>
+        <p class="coupon__percent">-10%</p>
+      </div>
+      <div class="coupon__body">
+        <p class="coupon__sub">{c.couponSub}</p>
+        <div class="coupon__code-row">
+          <code class="coupon__code">{c.couponCode}</code>
+          <button
+            class="btn btn--ghost btn--sm"
+            type="button"
+            data-coupon-copy
+            data-code={c.couponCode}
+            data-label-copy={c.couponCopy}
+            data-label-copied={c.couponCopied}
+          >
+            <span data-coupon-copy-text aria-live="polite">{c.couponCopy}</span>
+          </button>
+        </div>
+        <p class="coupon__caption">{c.couponCaption}</p>
+        <p class="coupon__note"><Sample />&nbsp;{c.couponNote}</p>
+      </div>
+    </div>
+
     <div class="actions">
       <a class="btn btn--primary" href={restaurant.whatsappHref} target="_blank" rel="noopener noreferrer" data-wa-link>
         {c.whatsapp}<span class="sr-only"> {c.newTab}</span>
+      </a>
+      <a class="btn btn--ghost" href="#" download data-calendar-link>
+        {c.addToCalendar}
       </a>
       <button class="btn btn--ghost" type="button" data-edit>{c.edit}</button>
     </div>
@@ -138,12 +176,31 @@ const c = {
 </div>
 
 <script>
+  import { buildIcsHref } from '../scripts/calendar';
+
+  // Piccolo festeggiamento alla conferma: scintille come quelle del capitolo "Brace" della home,
+  // ma qui sono un premio per l'azione compiuta, non decorazione. Spente con movimento ridotto.
+  const canBurst = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+  function burstSparks(container: HTMLElement | null | undefined) {
+    if (!container || !canBurst) return;
+    container.innerHTML = '';
+    const colors = ['var(--turquoise)', 'var(--brace)', 'var(--night-warn)'];
+    for (let i = 0; i < 14; i++) {
+      const dot = document.createElement('span');
+      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
+      const dist = 42 + Math.random() * 36;
+      dot.style.cssText = `--dx:${(Math.cos(angle) * dist).toFixed(1)}px; --dy:${(Math.sin(angle) * dist).toFixed(1)}px; background:${colors[i % colors.length]}; animation-delay:${(Math.random() * 80).toFixed(0)}ms;`;
+      container.appendChild(dot);
+    }
+  }
+
   const root = document.querySelector<HTMLElement>('[data-booking]');
   if (root) {
     const form = root.querySelector<HTMLFormElement>('[data-booking-form]')!;
     const result = root.querySelector<HTMLElement>('[data-booking-result]')!;
     const resultTitle = result.querySelector<HTMLElement>('[data-result-title]')!;
     const waLink = result.querySelector<HTMLAnchorElement>('[data-wa-link]')!;
+    const calendarLink = result.querySelector<HTMLAnchorElement>('[data-calendar-link]')!;
     const closedDay = Number(root.dataset.closedDay);
     const closedLabel = root.dataset.closedLabel ?? '';
     const waBase = root.dataset.wa ?? '';
@@ -202,6 +259,15 @@ const c = {
       input.addEventListener('change', () => attempted && validate(key));
     }
 
+    // Il telefono si riformatta a gruppi quando si esce dal campo: più facile da rileggere
+    // e da correggere prima di inviare, senza inseguire il cursore mentre si scrive.
+    fields.phone.addEventListener('blur', () => {
+      const digits = fields.phone.value.replace(/\D/g, '');
+      if (digits.length < 6) return;
+      const groups = digits.length > 10 ? [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6)] : [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 10)];
+      fields.phone.value = groups.filter(Boolean).join(' ');
+    });
+
     // Stepper persone: + e − rispettano il minimo e ripetono l'evento "input" per la validazione.
     root.querySelectorAll<HTMLButtonElement>('[data-step]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -239,15 +305,58 @@ const c = {
       const text = `Ciao Fairuz, vorrei prenotare un tavolo per ${peopleText}, ${longDate} alle ${fields.time.value}. Nome: ${name}.`;
       waLink.href = `${waBase}?text=${encodeURIComponent(text)}`;
 
+      calendarLink.href = buildIcsHref({
+        title: `Tavolo da Fairuz (${peopleText})`,
+        date: fields.date.value,
+        time: fields.time.value,
+        durationMinutes: 120,
+        description: `Richiesta di tavolo per ${peopleText} a nome di ${name}. Promemoria demo: da confermare con il ristorante.`,
+        location: 'Fairuz — Via Luigi Vigotti 5, 43126 Parma',
+      });
+      calendarLink.download = 'prenotazione-fairuz.ics';
+
       form.hidden = true;
       result.hidden = false;
       resultTitle.focus();
+      burstSparks(result.querySelector<HTMLElement>('[data-spark-burst]'));
+
+      // Il coupon compare dopo il segno di spunta, come uno sblocco: il CSS ritarda l'animazione
+      // (vedi .coupon--in), qui basta smettere di nasconderlo e attivarla se il movimento è permesso.
+      const coupon = result.querySelector<HTMLElement>('[data-coupon]');
+      if (coupon) {
+        coupon.hidden = false;
+        if (canBurst) coupon.classList.add('coupon--in');
+      }
+    });
+
+    const couponCopyBtn = result.querySelector<HTMLButtonElement>('[data-coupon-copy]');
+    const couponCopyText = couponCopyBtn?.querySelector<HTMLElement>('[data-coupon-copy-text]');
+    couponCopyBtn?.addEventListener('click', async () => {
+      const code = couponCopyBtn.dataset.code ?? '';
+      const copied = couponCopyBtn.dataset.labelCopied ?? '';
+      const original = couponCopyBtn.dataset.labelCopy ?? '';
+      try {
+        await navigator.clipboard.writeText(code);
+        if (couponCopyText) couponCopyText.textContent = copied;
+        setTimeout(() => {
+          if (couponCopyText) couponCopyText.textContent = original;
+        }, 2000);
+      } catch {
+        // Clipboard non disponibile (contesto non sicuro o permesso negato): il codice resta
+        // comunque visibile e selezionabile a mano, quindi il fallback è già il testo stesso.
+      }
     });
 
     result.querySelector<HTMLButtonElement>('[data-edit]')!.addEventListener('click', () => {
       result.hidden = true;
       form.hidden = false;
       fields.date.focus();
+      // Reimposta il coupon: una nuova richiesta deve rivivere lo sblocco, non ritrovarlo già aperto.
+      const coupon = result.querySelector<HTMLElement>('[data-coupon]');
+      if (coupon) {
+        coupon.hidden = true;
+        coupon.classList.remove('coupon--in');
+      }
     });
 
   }
@@ -403,6 +512,7 @@ const c = {
     outline-offset: 6px;
   }
   .tick {
+    position: relative;
     width: 3.5rem;
     height: 3.5rem;
     fill: none;
@@ -410,6 +520,35 @@ const c = {
     stroke-width: 3;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  /* Scintille della conferma: 14 puntini generati via JS, ognuno vola verso --dx/--dy e sfuma. */
+  .spark-burst {
+    position: absolute;
+    top: 1.75rem;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+  .spark-burst span {
+    position: absolute;
+    inset: 0;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin: -0.2rem;
+    border-radius: 50%;
+    animation: spark-fly 650ms var(--ease-out) both;
+  }
+  @keyframes spark-fly {
+    from {
+      translate: 0 0;
+      opacity: 1;
+    }
+    to {
+      translate: var(--dx) var(--dy);
+      opacity: 0;
+    }
   }
   .tick__ring,
   .tick__mark {
@@ -449,6 +588,116 @@ const c = {
   .summary dd {
     margin: 0;
     font-weight: 700;
+  }
+
+  /* Coupon "premio": si comporta come un mini biglietto (stub turchese + corpo), coerente con
+     .ticket in EventTicket.astro. Visibile e fermo di default; lo sblocco animato è un livello
+     in più aggiunto via JS/CSS (vedi .coupon--in), mai una condizione per vederne il contenuto. */
+  .coupon {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: var(--surface);
+    border: var(--rule-w) solid var(--rule-strong);
+    border-radius: var(--radius-md);
+  }
+  .coupon[hidden] {
+    display: none;
+  }
+  .coupon__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    /* Testo scuro fisso su turchese pieno (regola 5): identico in entrambi i temi. */
+    background: var(--turquoise);
+    color: var(--night);
+    border-bottom: 2px dashed var(--night);
+  }
+  .coupon__kicker {
+    color: inherit;
+  }
+  .coupon__percent {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--step-3);
+    line-height: 1;
+  }
+  .coupon__body {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-5);
+  }
+  .coupon__sub {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+  .coupon__code-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .coupon__code {
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: var(--step-0);
+    letter-spacing: 0.08em;
+    color: var(--link);
+    border: var(--rule-w) dashed var(--link);
+    border-radius: var(--radius-sm);
+  }
+  .coupon__caption,
+  .coupon__note {
+    margin: 0;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+
+  /* Sblocco stile "achievement": il coupon resta a scala 0 durante il ritardo (fill-mode both),
+     poi entra con un piccolo rimbalzo; la luce lo attraversa una volta a pop completato.
+     Con movimento ridotto la classe non viene mai aggiunta: il coupon è semplicemente già lì. */
+  .coupon--in {
+    animation: coupon-in 700ms var(--ease-out) 550ms both;
+  }
+  .coupon__shine {
+    position: absolute;
+    top: -60%;
+    left: -10%;
+    width: 35%;
+    height: 220%;
+    background: linear-gradient(75deg, transparent, color-mix(in srgb, #fff 55%, transparent), transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .coupon--in .coupon__shine {
+    animation: coupon-shine 850ms ease 1250ms both;
+  }
+  @keyframes coupon-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.7) rotate(-5deg);
+    }
+    65% {
+      opacity: 1;
+      transform: scale(1.035) rotate(1deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+  @keyframes coupon-shine {
+    from {
+      opacity: 1;
+      transform: translateX(0) rotate(20deg);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(420%) rotate(20deg);
+    }
   }
 
   @media (min-width: 40rem) {

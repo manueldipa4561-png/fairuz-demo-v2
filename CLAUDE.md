@@ -18,7 +18,7 @@ Astro 7 (statico, deploy Netlify) · GSAP + ScrollTrigger + Lenis (solo home cin
 - `scripts/contrast.mjs` — verifica WCAG dei token. Va rieseguito a ogni modifica di colore.
 
 ## Regole non negoziabili
-1. **Non inventare contenuti**: date evento, orari, prezzi, claim dietetici (glutine/halal/vegano), servizi (gift card, catering, ordini). Mancante → `<Todo>` (componente visibile) + voce in `docs/CONTENT-TODO.md`.
+1. **Non inventare contenuti**: date evento, orari, prezzi, claim dietetici (glutine/halal/vegano), servizi (gift card, catering, ordini). Per la presentazione al cliente (decisione del 21/09/2026) i contenuti mancanti sono riempiti con **esempi realistici sempre marcati col badge `<Sample>` ("Esempio")**, mai presentati come fatti; restano vietati i claim dietetici. Dati in `src/data/{menu,events,hours}.ts` (flag `*IsSample`). Ciò che è ancora da ottenere resta in `docs/CONTENT-TODO.md`. `<Todo>` resta per i casi in cui non si può nemmeno fare un esempio.
 2. Recensioni: mostrare solo **4,7/5 Tripadvisor, oltre 150 recensioni** + link alle recensioni reali. Niente `aggregateRating` nello schema.
 3. Origine del nome "Fairuz": NON affermarla (può riferirsi alla cantante libanese). Il turchese è una scelta di design, non un fatto del brand.
 4. Badge "Demo / Concept" sempre presente. La demo è `noindex` finché non si imposta `PUBLIC_ALLOW_INDEXING=true` su Netlify.

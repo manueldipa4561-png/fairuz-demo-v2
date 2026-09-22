@@ -12,7 +12,7 @@ const { dish } = Astro.props;
 
 {
   dish ? (
-    <article class="dish">
+    <article class="dish" data-dish>
       <div class="dish__head">
         <h3>{dish.name}</h3>
         {dish.price && <p class="dish__price label">{dish.price}</p>}
@@ -83,5 +83,31 @@ const { dish } = Astro.props;
   }
   .bar--short {
     width: 70%;
+  }
+
+  /* Scheda scelta da "Sorprendimi" (Menu.astro): un sollevamento composto, non un balzo giocattolo. */
+  .dish--surprise {
+    animation: dish-pop 900ms var(--ease-out);
+    outline: 2px solid var(--turquoise);
+    outline-offset: 3px;
+  }
+  @keyframes dish-pop {
+    0% {
+      transform: scale(1) translateY(0);
+      box-shadow: none;
+    }
+    40% {
+      transform: scale(1.025) translateY(-3px);
+      box-shadow: var(--shadow-soft);
+    }
+    100% {
+      transform: scale(1) translateY(0);
+      box-shadow: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dish--surprise {
+      animation: none;
+    }
   }
 </style>

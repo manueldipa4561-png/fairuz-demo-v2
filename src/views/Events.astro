@@ -3,9 +3,10 @@ import CtaBand from '../components/CtaBand.astro';
 import EventTicket from '../components/EventTicket.astro';
 import PageHero from '../components/PageHero.astro';
 import PhotoFrame from '../components/PhotoFrame.astro';
-import Todo from '../components/Todo.astro';
+import Sample from '../components/Sample.astro';
 import RhombusDivider from '../components/home/RhombusDivider.astro';
-import { events } from '../data/events';
+import { events, eventsAreSample } from '../data/events';
+import { findPhoto } from '../lib/photo';
 import { restaurant } from '../data/restaurant';
 import { pathFor, t, type Lang } from '../i18n';
 
@@ -21,14 +22,13 @@ const c = {
   title: 'Eventi & Esperienze',
   intro: 'Serate, sapori e occasioni per stare insieme a tavola.',
   nextTitle: 'Prossimi appuntamenti',
-  calendarTodo:
-    'calendario reale: date, orari, prezzi e modalità di prenotazione degli eventi da confermare con il cliente',
+  sampleNote: 'Eventi dimostrativi: date, orari e prezzi reali da confermare con il cliente.',
+  calendarEmpty: 'Il prossimo calendario è in preparazione: scrivici su WhatsApp per essere avvisato.',
   recurringTitle: 'Esperienze ricorrenti',
-  recurringTodo: 'esperienze ricorrenti (se esistono): nome, giorni, descrizione da confermare con il cliente',
-  recurringPhoto: 'foto reale: una serata da Fairuz',
+  recurringLead: 'Il weekend da Fairuz',
+  recurringText: 'Nel fine settimana la brace resta accesa fino a sera, tra mezze da condividere e grigliate. Programmazione reale da confermare con il cliente.',
   proposalsTitle: 'Proposte da valutare',
   proposalsIntro: 'Idee per ampliare l’offerta, mostrate come dimostrazione e da confermare con il cliente.',
-  proposalNote: 'Proposta — non è un servizio confermato di Fairuz',
   proposals: [
     { t: 'Gift card', p: 'Un regalo da vivere a tavola.' },
     { t: 'Catering & eventi privati', p: 'Fairuz per compleanni, cene aziendali e ricorrenze.' },
@@ -37,6 +37,7 @@ const c = {
   bandTitle: 'Vuoi sapere cosa c’è in programma?',
   bandText: 'Scrivici su WhatsApp o prenota il tuo tavolo.',
 };
+const hasRecurringPhoto = Boolean(findPhoto('evento-weekend'));
 ---
 
 <PageHero eyebrow={c.eyebrow} title={c.title} intro={c.intro}>
@@ -52,6 +53,7 @@ const c = {
   <div class="container">
     <div class="section-head">
       <h2 id="next">{c.nextTitle}</h2>
+      {eventsAreSample && <p><Sample /> {c.sampleNote}</p>}
     </div>
     <div class="ticket-list">
       {
@@ -59,7 +61,7 @@ const c = {
           events.map((event) => <EventTicket event={event} />)
         ) : (
           <EventTicket>
-            <p><Todo>{c.calendarTodo}</Todo></p>
+            <p>{c.calendarEmpty}</p>
           </EventTicket>
         )
       }
@@ -70,12 +72,17 @@ const c = {
 <RhombusDivider />
 
 <section class="section" aria-labelledby="recurring">
-  <div class="container recurring">
+  <div class:list={['container recurring', { 'recurring--single': !hasRecurringPhoto }]}>
     <div class="stack">
-      <h2 id="recurring">{c.recurringTitle}</h2>
-      <p><Todo>{c.recurringTodo}</Todo></p>
+      <h2 id="recurring">{c.recurringTitle} <Sample /></h2>
+      <p class="recurring__lead">{c.recurringLead}</p>
+      <p>{c.recurringText}</p>
     </div>
-    <div class="recurring__photo"><PhotoFrame todo={c.recurringPhoto} /></div>
+    {hasRecurringPhoto && (
+      <div class="recurring__photo">
+        <PhotoFrame name="evento-weekend" alt="Locandina degli appuntamenti del weekend con Fairuz" />
+      </div>
+    )}
   </div>
 </section>
 
@@ -91,7 +98,7 @@ const c = {
           <article class="card">
             <h3>{p.t}</h3>
             <p>{p.p}</p>
-            <p><Todo>{c.proposalNote}</Todo></p>
+            <p><Sample label="Proposta" /> da valutare con il cliente</p>
           </article>
         ))
       }
@@ -114,6 +121,18 @@ const c = {
     gap: var(--space-6);
     align-items: center;
   }
+  .recurring :global(h2) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .recurring__lead {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-1);
+    color: var(--ink-soft);
+  }
   .recurring__photo {
     --photo-ratio: 4 / 3;
     width: 100%;
@@ -123,7 +142,7 @@ const c = {
     padding-top: 0;
   }
   @media (min-width: 60rem) {
-    .recurring {
+    .recurring:not(.recurring--single) {
       grid-template-columns: 1fr 1fr;
     }
     .recurring__photo {

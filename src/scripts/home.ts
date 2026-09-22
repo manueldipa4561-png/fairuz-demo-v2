@@ -66,6 +66,21 @@ initMotion(({ desktop, headerH }) => {
     return s.chars;
   };
 
+  // ── Uscita dell'hero ───────────────────────────────────────────
+  // Il frame sale, rimpicciolisce e sfuma entrando nel racconto: passaggio cinematico, non uno scroll piatto.
+  // Solo transform + opacity (GPU); a scroll 0 è identità, quindi non disturba l'ingresso CSS dell'hero.
+  const heroFrame = $('.hero__frame');
+  if (heroFrame) {
+    gsap.to(heroFrame, {
+      yPercent: -8,
+      scale: 0.94,
+      autoAlpha: 0.25,
+      transformOrigin: 'center top',
+      ease: 'none',
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+    });
+  }
+
   // ── Capitoli ───────────────────────────────────────────────────
   for (const chapter of $$('[data-chapter]')) {
     const word = $('[data-chapter-word]', chapter);
@@ -73,13 +88,10 @@ initMotion(({ desktop, headerH }) => {
     const strokes = $$('[data-draw]', chapter);
 
     if (word) {
-      gsap.from(split(word), {
-        yPercent: 105,
-        duration: 1,
-        ease: 'expo.out',
-        stagger: 0.05,
-        scrollTrigger: { trigger: chapter, start: 'top 72%' },
-      });
+      const enter = { trigger: chapter, start: 'top 72%' };
+      gsap.from(split(word), { yPercent: 105, duration: 1, ease: 'expo.out', stagger: 0.05, scrollTrigger: enter });
+      // Zoom-settle: la parola si posa entrando, oltre alla rivelazione lettera per lettera.
+      gsap.from(word, { scale: 1.08, transformOrigin: 'left center', duration: 1.1, ease: 'expo.out', scrollTrigger: enter });
     }
     gsap.from(text, {
       y: 28,
@@ -104,6 +116,19 @@ initMotion(({ desktop, headerH }) => {
       tl.fromTo(strokes, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, stagger: 0.12, duration: 1 });
     }
     chapterScenes[chapter.dataset.chapter ?? '']?.(chapter, tl);
+
+    // Parallasse: il disegno e la parola gigante scorrono a velocità diversa dal testo → profondità.
+    // Legata all'intero passaggio del capitolo (non al pin), quindi vive anche su mobile.
+    const depth = (el: Element | null, from: number, to: number) => {
+      if (!el) return;
+      gsap.fromTo(
+        el,
+        { yPercent: from },
+        { yPercent: to, ease: 'none', scrollTrigger: { trigger: chapter, start: 'top bottom', end: 'bottom top', scrub: true } },
+      );
+    };
+    depth($('.chapter__art', chapter), 14, -14);
+    depth(word, 7, -7);
   }
 
   return () => splits.forEach((s) => s.revert());
