@@ -8,6 +8,7 @@
  */
 import { restaurant } from '../data/restaurant';
 import Sample from './Sample.astro';
+import Seal from './home/Seal.astro';
 import { hoursAreSample, sampleHours } from '../data/hours';
 
 const c = {
@@ -52,7 +53,7 @@ const c = {
   data-closed-label={restaurant.closedDay}
   data-wa={restaurant.whatsappHref}
 >
-  <div class="confetti" data-confetti aria-hidden="true"></div>
+  <div class="embers" data-embers aria-hidden="true"></div>
   <p class="booking__demo">
     <span class="label booking__badge">{c.demo}</span>
     {c.demoText}
@@ -129,6 +130,10 @@ const c = {
       <circle class="tick__ring" cx="26" cy="26" r="23" pathLength="1"></circle>
       <path class="tick__mark" d="M15 27 l8 8 l15 -17" pathLength="1"></path>
     </svg>
+    <div class="stamp" data-stamp aria-hidden="true" hidden>
+      <div class="stamp__ring"></div>
+      <Seal />
+    </div>
     <h3 tabindex="-1" data-result-title>{c.resultTitle}</h3>
     <p>{c.resultLead}</p>
     <dl class="summary">
@@ -195,54 +200,48 @@ const c = {
     }
   }
 
-  // Coriandoli "a petardo": partono dal segno di spunta (non da una riga in alto allo schermo come
-  // le pioggie generiche), si aprono a ventaglio verso l'alto, poi la gravità li fa ricadere oltre il
-  // fondo mentre tumbano in 3D (rotateX+rotateY, non un solo asse piatto). Forme e colori del brand
-  // (rombo pieno, rombo a contorno, striscia, pallino; turchese/brace/blush/ink), non un plugin
-  // generico. Solo transform+opacity (GPU), spenta con movimento ridotto; i pezzi si ripuliscono da
-  // soli così una nuova prenotazione riparte da zero.
-  function rainConfetti(container: HTMLElement | null | undefined, originEl?: HTMLElement | null) {
+  // Braci che salgono dal sigillo, come quelle del capitolo "Brace" della home: non un effetto
+  // generico, ma il vocabolario visivo che il visitatore ha già visto scorrendo la home, richiamato
+  // qui come premio. Colore del fuoco (brace/night-warn) con un tocco di turchese — la firma del
+  // brand — non arcobaleno. Solo transform+opacity (GPU), spenta con movimento ridotto; i pezzi si
+  // ripuliscono da soli così una nuova prenotazione riparte da zero.
+  function riseEmbers(container: HTMLElement | null | undefined, originEl?: HTMLElement | null) {
     if (!container || !canBurst) return;
     container.innerHTML = '';
     const originRect = originEl?.getBoundingClientRect();
     const ox = originRect ? originRect.left + originRect.width / 2 : window.innerWidth / 2;
-    const oy = originRect ? originRect.top + originRect.height / 2 : window.innerHeight * 0.22;
-    const colors = ['var(--turquoise)', 'var(--brace)', 'var(--blush)', 'var(--night-accent)', 'var(--ink)'];
-    const shapes = ['confetti__piece--diamond', 'confetti__piece--outline', 'confetti__piece--bar', 'confetti__piece--dot'];
-    const total = 70;
+    const oy = originRect ? originRect.top + originRect.height / 2 : window.innerHeight * 0.3;
+    const colors = ['var(--brace)', 'var(--night-warn)', 'var(--brace)', 'var(--night-warn)', 'var(--turquoise)'];
+    const total = 28;
     let longestMs = 0;
     for (let i = 0; i < total; i++) {
-      const piece = document.createElement('span');
-      const shape = shapes[i % shapes.length];
-      piece.className = `confetti__piece ${shape}`;
+      const ember = document.createElement('span');
+      ember.className = 'embers__piece';
+      const color = colors[i % colors.length];
 
-      // Ventaglio verso l'alto (-20° … -160°): mai verso il basso al lancio, come un vero petardo.
-      const angle = ((-20 - Math.random() * 140) * Math.PI) / 180;
-      const launchDist = 70 + Math.random() * 200;
-      const launchX = Math.cos(angle) * launchDist;
-      const launchY = Math.sin(angle) * launchDist;
-      const drift = (Math.random() - 0.5) * 260;
-      const landY = window.innerHeight - oy + 140;
-
-      const duration = 2400 + Math.random() * 1600;
-      const delay = Math.random() * 260;
+      const startX = (Math.random() - 0.5) * 90;
+      const riseX = (Math.random() - 0.5) * 170;
+      const riseY = -(150 + Math.random() * 230);
+      const wobble = (Math.random() - 0.5) * 60;
+      const size = 0.2 + Math.random() * 0.24;
+      const duration = 1500 + Math.random() * 1300;
+      const delay = 120 + Math.random() * 480;
       longestMs = Math.max(longestMs, duration + delay);
 
-      piece.style.cssText = [
-        `left:${ox.toFixed(0)}px`,
+      ember.style.cssText = [
+        `left:${(ox + startX).toFixed(0)}px`,
         `top:${oy.toFixed(0)}px`,
-        `--launch-x:${launchX.toFixed(0)}px`,
-        `--launch-y:${launchY.toFixed(0)}px`,
-        `--land-x:${(launchX + drift).toFixed(0)}px`,
-        `--land-y:${landY.toFixed(0)}px`,
-        `--spin-x:${(Math.random() * 640 - 320).toFixed(0)}deg`,
-        `--spin-y:${(Math.random() * 640 - 320).toFixed(0)}deg`,
-        `--scale:${(0.7 + Math.random() * 0.9).toFixed(2)}`,
+        `width:${size.toFixed(2)}rem`,
+        `height:${size.toFixed(2)}rem`,
+        `--wobble:${wobble.toFixed(0)}px`,
+        `--rise-x:${riseX.toFixed(0)}px`,
+        `--rise-y:${riseY.toFixed(0)}px`,
         `--duration:${duration.toFixed(0)}ms`,
         `--delay:${delay.toFixed(0)}ms`,
-        shape === 'confetti__piece--outline' ? `border-color:${colors[i % colors.length]}` : `background:${colors[i % colors.length]}`,
+        `background:${color}`,
+        `color:${color}`,
       ].join('; ');
-      container.appendChild(piece);
+      container.appendChild(ember);
     }
     setTimeout(() => {
       container.innerHTML = '';
@@ -374,7 +373,15 @@ const c = {
       result.hidden = false;
       resultTitle.focus();
       burstSparks(result.querySelector<HTMLElement>('[data-spark-burst]'));
-      rainConfetti(root.querySelector<HTMLElement>('[data-confetti]'), result.querySelector<HTMLElement>('.tick'));
+
+      // Il sigillo timbra dopo il segno di spunta: prima lo si mostra (serve la sua posizione reale
+      // per far partire le braci da lì), poi si attiva l'animazione se il movimento è permesso.
+      const stamp = result.querySelector<HTMLElement>('[data-stamp]');
+      if (stamp) {
+        stamp.hidden = false;
+        if (canBurst) stamp.classList.add('stamp--in');
+      }
+      riseEmbers(root.querySelector<HTMLElement>('[data-embers]'), stamp);
 
       // Il coupon compare dopo il segno di spunta, come uno sblocco: il CSS ritarda l'animazione
       // (vedi .coupon--in), qui basta smettere di nasconderlo e attivarla se il movimento è permesso.
@@ -407,11 +414,16 @@ const c = {
       result.hidden = true;
       form.hidden = false;
       fields.date.focus();
-      // Reimposta il coupon: una nuova richiesta deve rivivere lo sblocco, non ritrovarlo già aperto.
+      // Reimposta coupon e sigillo: una nuova richiesta deve rivivere lo sblocco, non ritrovarli già aperti.
       const coupon = result.querySelector<HTMLElement>('[data-coupon]');
       if (coupon) {
         coupon.hidden = true;
         coupon.classList.remove('coupon--in');
+      }
+      const stamp = result.querySelector<HTMLElement>('[data-stamp]');
+      if (stamp) {
+        stamp.hidden = true;
+        stamp.classList.remove('stamp--in');
       }
     });
 
@@ -589,15 +601,66 @@ const c = {
     pointer-events: none;
   }
 
-  /* Pioggia di coriandoli a schermo intero (rainConfetti nello script): forme e colori del brand,
-     non un plugin generico. Sopra grana (200) e barra di scroll (210), sotto niente: è il momento clou.
-     Lo stile dei singoli pezzi è anch'esso nel blocco is:global più sotto. */
-  .confetti {
+  /* Braci che salgono dal sigillo (riseEmbers nello script): il vocabolario visivo della home
+     ("Brace"), non un plugin generico. Sopra grana (200) e barra di scroll (210). Lo stile dei
+     singoli pezzi è nel blocco is:global più sotto (nascono via JS, vedi il perché lì). */
+  .embers {
     position: fixed;
     inset: 0;
     z-index: 220;
     overflow: hidden;
     pointer-events: none;
+  }
+
+  /* Il sigillo timbra la conferma: parte grande e ruotato, "atterra" con un piccolo rimbalzo
+     (overshoot), un anello si espande e sfuma come inchiostro che si allarga. Riusa <Seal />
+     (lo stesso della home): la sua rotazione lenta continua a vivere dopo il timbro. */
+  .stamp {
+    position: relative;
+    justify-self: center;
+    width: clamp(4rem, 16vw, 5.25rem);
+  }
+  .stamp[hidden] {
+    display: none;
+  }
+  .stamp--in {
+    animation: stamp-down 650ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .stamp__ring {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    border-radius: 50%;
+    border: 2px solid var(--turquoise);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .stamp--in .stamp__ring {
+    animation: stamp-ring 750ms var(--ease-out) 120ms both;
+  }
+  @keyframes stamp-down {
+    0% {
+      opacity: 0;
+      transform: scale(2.1) rotate(-16deg);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(0.94) rotate(3deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+  @keyframes stamp-ring {
+    0% {
+      opacity: 0.9;
+      transform: scale(0.55);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2.3);
+    }
   }
   .tick__ring,
   .tick__mark {
@@ -762,10 +825,10 @@ const c = {
 <!--
   Astro attribuisce l'hash di scope a OGNI segmento di un selettore (anche i discendenti), non solo
   al primo: ".spark-burst span" compila come ".spark-burst[data-astro-cid] span[data-astro-cid]".
-  Gli <span> delle scintille e i pezzi dei coriandoli nascono via JS dopo il render e non portano
-  quell'attributo, quindi le regole scoped non li avrebbero mai raggiunti (verificato: senza questo
-  blocco i pezzi restavano a 0×0, invisibili). Questo blocco is:global copre solo quei selettori;
-  i contenitori (.spark-burst, .confetti) restano scoped qui sopra.
+  Gli <span> delle scintille e delle braci nascono via JS dopo il render e non portano quell'attributo,
+  quindi le regole scoped non li avrebbero mai raggiunti (verificato: senza questo blocco i pezzi
+  restavano a 0×0, invisibili). Questo blocco is:global copre solo quei selettori; i contenitori
+  (.spark-burst, .embers) restano scoped qui sopra.
 -->
 <style is:global>
   .spark-burst span {
@@ -788,56 +851,34 @@ const c = {
     }
   }
 
-  /* left/top fissano il punto di lancio (il segno di spunta, calcolato in JS); tutto il resto
-     del moto è nel transform, come delta da quel punto — vedi confetti-cannon più sotto. */
-  .confetti .confetti__piece {
+  /* left/top fissano il punto di partenza (il sigillo, calcolato in JS); il resto del moto è nel
+     transform, come delta da quel punto. Bagliore con box-shadow in currentColor (color: impostato
+     via JS insieme a background), coerente col fuoco della home. */
+  .embers .embers__piece {
     position: absolute;
     top: 0;
     left: 0;
-    width: 0.6rem;
-    height: 0.6rem;
-    animation: confetti-cannon var(--duration) linear var(--delay) both;
-  }
-  .confetti .confetti__piece--diamond {
-    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  }
-  .confetti .confetti__piece--outline {
-    background: none;
-    border: 0.11rem solid;
-    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  }
-  .confetti .confetti__piece--bar {
-    width: 0.3rem;
-    height: 1.15rem;
-    border-radius: 1px;
-  }
-  .confetti .confetti__piece--dot {
     border-radius: 50%;
+    box-shadow: 0 0 0.4rem 0.05rem currentColor;
+    animation: ember-rise var(--duration) var(--ease-out) var(--delay) both;
   }
-  /* Lancio a petardo (0→32%, decelera come uno scatto) poi caduta sotto gravità (32→100%, accelera):
-     due firme di easing diverse, non un'unica curva piatta — è quello che distingue un vero "botto"
-     da una pioggia generica. Il tumbling 3D (rotateX+rotateY con perspective() per pezzo) continua
-     per tutta la durata; la scala varia da pezzo a pezzo per una resa più ricca. */
-  @keyframes confetti-cannon {
+  /* Sale con un'oscillazione laterale (non una linea retta) e si affievolisce come una brace vera,
+     non solo per opacità: si restringe leggermente mentre sale. */
+  @keyframes ember-rise {
     0% {
-      transform: perspective(480px) translate(0, 0) rotateX(0deg) rotateY(0deg) scale(0);
+      transform: translate(0, 0) scale(0.5);
       opacity: 0;
-      animation-timing-function: cubic-bezier(0.17, 0.84, 0.44, 1);
     }
-    10% {
+    14% {
       opacity: 1;
+      transform: translate(0, calc(var(--rise-y) * 0.1)) scale(1);
     }
-    32% {
-      transform: perspective(480px) translate(var(--launch-x), var(--launch-y)) rotateX(calc(var(--spin-x) * 0.35))
-        rotateY(calc(var(--spin-y) * 0.35)) scale(var(--scale));
-      animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.19);
-    }
-    82% {
-      opacity: 1;
+    55% {
+      transform: translate(var(--wobble), calc(var(--rise-y) * 0.58)) scale(0.85);
+      opacity: 0.9;
     }
     100% {
-      transform: perspective(480px) translate(var(--land-x), var(--land-y)) rotateX(var(--spin-x)) rotateY(var(--spin-y))
-        scale(var(--scale));
+      transform: translate(var(--rise-x), var(--rise-y)) scale(0.35);
       opacity: 0;
     }
   }
