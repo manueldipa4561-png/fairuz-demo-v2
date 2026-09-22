@@ -104,6 +104,19 @@ initMotion(({ desktop, headerH }) => {
       tl.fromTo(strokes, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, stagger: 0.12, duration: 1 });
     }
     chapterScenes[chapter.dataset.chapter ?? '']?.(chapter, tl);
+
+    // Parallasse: il disegno e la parola gigante scorrono a velocità diversa dal testo → profondità.
+    // Legata all'intero passaggio del capitolo (non al pin), quindi vive anche su mobile.
+    const depth = (el: Element | null, from: number, to: number) => {
+      if (!el) return;
+      gsap.fromTo(
+        el,
+        { yPercent: from },
+        { yPercent: to, ease: 'none', scrollTrigger: { trigger: chapter, start: 'top bottom', end: 'bottom top', scrub: true } },
+      );
+    };
+    depth($('.chapter__art', chapter), 14, -14);
+    depth(word, 7, -7);
   }
 
   return () => splits.forEach((s) => s.revert());

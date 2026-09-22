@@ -83,6 +83,8 @@ const ch = {
 const bookHref = `${pathFor('visit', lang)}#prenota`;
 ---
 
+<div class="scroll-progress" aria-hidden="true"></div>
+
 <section class="hero">
   <div class="container">
     <div class="hero__frame">
@@ -106,6 +108,7 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
 </section>
 
 <RhombusDivider />
+<div class="dawn" aria-hidden="true"></div>
 
 <Chapter id="brace" index="01" word="Brace" kicker={ch.brace.kicker} tone="night" pin photoName="barbecue" photoAlt="Spiedini di carne cotti al carbone">
   <p class="lead">{ch.brace.lead}</p>
@@ -317,10 +320,38 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
     }
   }
 
+  /* Ingresso nella notte: la carta sfuma nel buio prima del capitolo Brace. */
+  .dawn {
+    height: clamp(5rem, 14vh, 10rem);
+    background: linear-gradient(to bottom, var(--paper), var(--night));
+  }
   /* Passaggio dalla notte (fuoco, fumo) alla carta (pane, tavola). */
   .dusk {
     height: clamp(6rem, 18vh, 12rem);
     background: linear-gradient(to bottom, var(--night), var(--paper));
+  }
+
+  /* Barra di avanzamento scroll: filetto turchese che cresce da sinistra. Solo CSS (Chromium),
+     spenta con movimento ridotto; dove non è supportata resta invisibile (scaleX:0). */
+  .scroll-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 3px;
+    z-index: calc(var(--z-header) + 5);
+    background: var(--turquoise);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .scroll-progress {
+        animation: progress-grow linear both;
+        animation-timeline: scroll(root);
+      }
+      @keyframes progress-grow {
+        to { transform: scaleX(1); }
+      }
+    }
   }
 
   .visit-facts {
