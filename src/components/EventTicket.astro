@@ -15,6 +15,12 @@ const fmt = (opts: Intl.DateTimeFormatOptions) =>
   when ? new Intl.DateTimeFormat('it-IT', { timeZone: 'UTC', ...opts }).format(when) : '';
 ---
 
+<script>
+  // Un solo import/chiamata anche con più biglietti in pagina: Astro deduplica gli <script> identici.
+  import { wireIcsLinks } from '../scripts/calendar';
+  wireIcsLinks();
+</script>
+
 <article class:list={['ticket', { 'ticket--empty': !event }]}>
   <div class="ticket__stub" aria-hidden={event ? undefined : 'true'}>
     {
@@ -43,6 +49,23 @@ const fmt = (opts: Intl.DateTimeFormatOptions) =>
             {event.time && <li>{event.time}</li>}
             {event.price && <li>{event.price}</li>}
           </ul>
+          <a
+            class="ticket__ics"
+            href="#"
+            download
+            data-ics
+            data-ics-title={event.title}
+            data-ics-date={event.date}
+            data-ics-time={event.time}
+            data-ics-desc={event.description}
+            data-ics-loc="Fairuz — Via Luigi Vigotti 5, 43126 Parma"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <rect x="1.5" y="2.5" width="13" height="12" rx="1.5"></rect>
+              <path d="M1.5 6h13M4.5 1v3M11.5 1v3"></path>
+            </svg>
+            Aggiungi al calendario
+          </a>
         </>
       ) : (
         <>
@@ -117,6 +140,40 @@ const fmt = (opts: Intl.DateTimeFormatOptions) =>
   }
   .bar--short {
     width: 65%;
+  }
+
+  /* Azione utile del biglietto: scarica un .ics reale (RFC 5545), non solo decorazione. */
+  .ticket__ics {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    justify-self: start;
+    min-height: var(--touch-min);
+    padding-inline: var(--space-3);
+    margin-top: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--link);
+    border: var(--rule-w) solid var(--rule);
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .ticket__ics svg {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .ticket__ics:hover {
+    background: var(--turquoise);
+    color: var(--night);
+    border-color: var(--turquoise);
   }
 
   @media (min-width: 40rem) {
