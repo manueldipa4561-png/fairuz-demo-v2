@@ -66,6 +66,21 @@ initMotion(({ desktop, headerH }) => {
     return s.chars;
   };
 
+  // ── Uscita dell'hero ───────────────────────────────────────────
+  // Il frame sale, rimpicciolisce e sfuma entrando nel racconto: passaggio cinematico, non uno scroll piatto.
+  // Solo transform + opacity (GPU); a scroll 0 è identità, quindi non disturba l'ingresso CSS dell'hero.
+  const heroFrame = $('.hero__frame');
+  if (heroFrame) {
+    gsap.to(heroFrame, {
+      yPercent: -8,
+      scale: 0.94,
+      autoAlpha: 0.25,
+      transformOrigin: 'center top',
+      ease: 'none',
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+    });
+  }
+
   // ── Capitoli ───────────────────────────────────────────────────
   for (const chapter of $$('[data-chapter]')) {
     const word = $('[data-chapter-word]', chapter);
@@ -73,13 +88,10 @@ initMotion(({ desktop, headerH }) => {
     const strokes = $$('[data-draw]', chapter);
 
     if (word) {
-      gsap.from(split(word), {
-        yPercent: 105,
-        duration: 1,
-        ease: 'expo.out',
-        stagger: 0.05,
-        scrollTrigger: { trigger: chapter, start: 'top 72%' },
-      });
+      const enter = { trigger: chapter, start: 'top 72%' };
+      gsap.from(split(word), { yPercent: 105, duration: 1, ease: 'expo.out', stagger: 0.05, scrollTrigger: enter });
+      // Zoom-settle: la parola si posa entrando, oltre alla rivelazione lettera per lettera.
+      gsap.from(word, { scale: 1.08, transformOrigin: 'left center', duration: 1.1, ease: 'expo.out', scrollTrigger: enter });
     }
     gsap.from(text, {
       y: 28,

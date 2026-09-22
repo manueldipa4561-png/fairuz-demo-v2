@@ -83,8 +83,6 @@ const ch = {
 const bookHref = `${pathFor('visit', lang)}#prenota`;
 ---
 
-<div class="scroll-progress" aria-hidden="true"></div>
-
 <section class="hero">
   <div class="container">
     <div class="hero__frame">
@@ -329,29 +327,6 @@ const bookHref = `${pathFor('visit', lang)}#prenota`;
   .dusk {
     height: clamp(6rem, 18vh, 12rem);
     background: linear-gradient(to bottom, var(--night), var(--paper));
-  }
-
-  /* Barra di avanzamento scroll: filetto turchese che cresce da sinistra. Solo CSS (Chromium),
-     spenta con movimento ridotto; dove non è supportata resta invisibile (scaleX:0). */
-  .scroll-progress {
-    position: fixed;
-    inset: 0 0 auto 0;
-    height: 3px;
-    z-index: calc(var(--z-header) + 5);
-    background: var(--turquoise);
-    transform: scaleX(0);
-    transform-origin: left;
-  }
-  @supports (animation-timeline: scroll()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .scroll-progress {
-        animation: progress-grow linear both;
-        animation-timeline: scroll(root);
-      }
-      @keyframes progress-grow {
-        to { transform: scaleX(1); }
-      }
-    }
   }
 
   .visit-facts {
